@@ -82,11 +82,17 @@ public class ProtocolScheduleBuilder<C> {
         OptionalLong.of(0),
         MainnetProtocolSpecs.frontierDefinition(
             config.getContractSizeLimit(), config.getEvmStackSize()));
+    // todo ed commented for expirementing
+    //    addProtocolSpec(
+    //        protocolSchedule,
+    //        config.getHomesteadBlockNumber(),
+    //        MainnetProtocolSpecs.homesteadDefinition(
+    //            config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getHomesteadBlockNumber(),
-        MainnetProtocolSpecs.homesteadDefinition(
-            config.getContractSizeLimit(), config.getEvmStackSize()));
+        MainnetProtocolSpecs.homesteadDefinitionWithChain(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
 
     config
         .getDaoForkBlock()
@@ -114,10 +120,15 @@ public class ProtocolScheduleBuilder<C> {
         config.getTangerineWhistleBlockNumber(),
         MainnetProtocolSpecs.tangerineWhistleDefinition(
             config.getContractSizeLimit(), config.getEvmStackSize()));
+    //    addProtocolSpec(
+    //            protocolSchedule,
+    //            config.getSpuriousDragonBlockNumber(),
+    //            MainnetProtocolSpecs.spuriousDragonDefinition(
+    //                    chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getSpuriousDragonBlockNumber(),
-        MainnetProtocolSpecs.spuriousDragonDefinition(
+        MainnetProtocolSpecs.spuriousDragonExperimentDefinition(
             chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
@@ -151,6 +162,11 @@ public class ProtocolScheduleBuilder<C> {
             config.getContractSizeLimit(),
             config.getEvmStackSize(),
             isRevertReasonEnabled));
+    addProtocolSpec(
+        protocolSchedule,
+        config.getDefuseDifficultyBombBlockNumber(),
+        MainnetProtocolSpecs.defuseDifficultyBombDefinition(
+            chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,
         config.getAtlantisBlockNumber(),

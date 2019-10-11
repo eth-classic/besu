@@ -152,6 +152,28 @@ public abstract class MainnetProtocolSpecs {
         .name("Homestead");
   }
 
+  public static ProtocolSpecBuilder<Void> homesteadDefinitionWithChain(
+      final Optional<BigInteger> chainId,
+      final OptionalInt configContractSizeLimit,
+      final OptionalInt configStackSizeLimit) {
+    final int contractSizeLimit = configContractSizeLimit.orElse(FRONTIER_CONTRACT_SIZE_LIMIT);
+    return frontierDefinition(configContractSizeLimit, configStackSizeLimit)
+        .gasCalculator(HomesteadGasCalculator::new)
+        .evmBuilder(MainnetEvmRegistries::homestead)
+        .contractCreationProcessorBuilder(
+            (gasCalculator, evm) ->
+                new MainnetContractCreationProcessor(
+                    gasCalculator,
+                    evm,
+                    true,
+                    Collections.singletonList(MaxCodeSizeRule.of(contractSizeLimit)),
+                    0))
+        .transactionValidatorBuilder(
+            gasCalculator -> new MainnetTransactionValidator(gasCalculator, true, chainId))
+        .difficultyCalculator(MainnetDifficultyCalculators.HOMESTEAD)
+        .name("Homestead");
+  }
+
   public static ProtocolSpecBuilder<Void> daoRecoveryInitDefinition(
       final OptionalInt contractSizeLimit, final OptionalInt configStackSizeLimit) {
     return homesteadDefinition(contractSizeLimit, configStackSizeLimit)
@@ -184,6 +206,17 @@ public abstract class MainnetProtocolSpecs {
     return homesteadDefinition(contractSizeLimit, configStackSizeLimit)
         .gasCalculator(TangerineWhistleGasCalculator::new)
         .name("TangerineWhistle");
+  }
+
+  public static ProtocolSpecBuilder<Void> defuseDifficultyBombDefinition(
+      final Optional<BigInteger> chainId,
+      final OptionalInt contractSizeLimit,
+      final OptionalInt configStackSizeLimit) {
+    return tangerineWhistleDefinition(contractSizeLimit, configStackSizeLimit)
+        .difficultyCalculator(MainnetDifficultyCalculators.DIFFICULTY_BOMB_REMOVED)
+        .transactionValidatorBuilder(
+            gasCalculator -> new MainnetTransactionValidator(gasCalculator, true, chainId))
+        .name("DefuseDifficultyBomb");
   }
 
   public static ProtocolSpecBuilder<Void> spuriousDragonDefinition(
@@ -227,6 +260,51 @@ public abstract class MainnetProtocolSpecs {
                     true,
                     stackSizeLimit,
                     Account.DEFAULT_VERSION))
+        .name("SpuriousDragon");
+  }
+
+  public static ProtocolSpecBuilder<Void> spuriousDragonExperimentDefinition(
+      final Optional<BigInteger> chainId,
+      final OptionalInt configContractSizeLimit,
+      final OptionalInt configStackSizeLimit) {
+    final int contractSizeLimit =
+        configContractSizeLimit.orElse(SPURIOUS_DRAGON_CONTRACT_SIZE_LIMIT);
+    final int stackSizeLimit = configStackSizeLimit.orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
+
+    return tangerineWhistleDefinition(OptionalInt.empty(), configStackSizeLimit)
+        .gasCalculator(SpuriousDragonGasCalculator::new)
+        .skipZeroBlockRewards(true)
+        .messageCallProcessorBuilder(
+            (evm, precompileContractRegistry) ->
+                new MainnetMessageCallProcessor(
+                    evm,
+                    precompileContractRegistry,
+                    SPURIOUS_DRAGON_FORCE_DELETE_WHEN_EMPTY_ADDRESSES))
+        .contractCreationProcessorBuilder(
+            (gasCalculator, evm) ->
+                new MainnetContractCreationProcessor(
+                    gasCalculator,
+                    evm,
+                    true,
+                    Collections.singletonList(MaxCodeSizeRule.of(contractSizeLimit)),
+                    1,
+                    SPURIOUS_DRAGON_FORCE_DELETE_WHEN_EMPTY_ADDRESSES))
+        .transactionValidatorBuilder(
+            gasCalculator -> new MainnetTransactionValidator(gasCalculator, true, chainId))
+        .transactionProcessorBuilder(
+            (gasCalculator,
+                transactionValidator,
+                contractCreationProcessor,
+                messageCallProcessor) ->
+                new MainnetTransactionProcessor(
+                    gasCalculator,
+                    transactionValidator,
+                    contractCreationProcessor,
+                    messageCallProcessor,
+                    true,
+                    stackSizeLimit,
+                    Account.DEFAULT_VERSION))
+        .transactionReceiptFactory(MainnetProtocolSpecs::frontierTransactionReceiptFactory)
         .name("SpuriousDragon");
   }
 
