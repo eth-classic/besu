@@ -38,7 +38,8 @@ public class ClassicProtocolSpecs {
       final OptionalInt configContractSizeLimit,
       final OptionalInt configStackSizeLimit) {
 
-    return tangerineWhistleDefinition(chainId, OptionalInt.empty(), configStackSizeLimit)
+
+    return MainnetProtocolSpecs.spuriousDragonDefinition(chainId, OptionalInt.empty(), configStackSizeLimit)
         .gasCalculator(DieHardGasCalculator::new)
         .difficultyCalculator(ClassicDifficultyCalculators.DIFFICULTY_BOMB_DELAYED)
         .transactionValidatorBuilder(
