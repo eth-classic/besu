@@ -117,7 +117,7 @@ public class ProtocolScheduleBuilder<C> {
     addProtocolSpec(
         protocolSchedule,
         config.getEcip1015BlockNumber(),
-        ClassicProtocolSpecs.tangerineWhistleDefinition(
+        ClassicProtocolSpecs.ecip1015Definition(
             chainId, config.getContractSizeLimit(), config.getEvmStackSize()));
     addProtocolSpec(
         protocolSchedule,

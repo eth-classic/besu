@@ -13,23 +13,35 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 package org.hyperledger.besu.ethereum.mainnet;
+import org.hyperledger.besu.ethereum.mainnet.contractvalidation.MaxCodeSizeRule;
 
 import java.math.BigInteger;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Collections;
 
 public class ClassicProtocolSpecs {
 
   public static final int SPURIOUS_DRAGON_CONTRACT_SIZE_LIMIT = 24576;
 
-  public static ProtocolSpecBuilder<Void> tangerineWhistleDefinition(
+  public static ProtocolSpecBuilder<Void> ecip1015Definition(
       final Optional<BigInteger> chainId,
-      final OptionalInt contractSizeLimit,
+      final OptionalInt configContractSizeLimit,
       final OptionalInt configStackSizeLimit) {
-    return MainnetProtocolSpecs.homesteadDefinition(contractSizeLimit, configStackSizeLimit)
+    final int contractSizeLimit = configContractSizeLimit.orElse(MainnetProtocolSpecs.FRONTIER_CONTRACT_SIZE_LIMIT);
+
+    return MainnetProtocolSpecs.homesteadDefinition(configContractSizeLimit, configStackSizeLimit)
         .gasCalculator(TangerineWhistleGasCalculator::new)
         .transactionValidatorBuilder(
             gasCalculator -> new MainnetTransactionValidator(gasCalculator, true, chainId))
+        .contractCreationProcessorBuilder(
+            (gasCalculator, evm) ->
+                new MainnetContractCreationProcessor(
+                    gasCalculator,
+                    evm,
+                    true,
+                    Collections.singletonList(MaxCodeSizeRule.of(contractSizeLimit)),
+                    0))
         .name("ClassicTangerineWhistle");
   }
 
@@ -39,7 +51,7 @@ public class ClassicProtocolSpecs {
       final OptionalInt configStackSizeLimit) {
 
 
-    return MainnetProtocolSpecs.spuriousDragonDefinition(chainId, OptionalInt.empty(), configStackSizeLimit)
+    return ecip1015Definition(chainId, OptionalInt.empty(), configStackSizeLimit)
         .gasCalculator(DieHardGasCalculator::new)
         .difficultyCalculator(ClassicDifficultyCalculators.DIFFICULTY_BOMB_DELAYED)
         .transactionValidatorBuilder(
