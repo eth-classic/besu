@@ -125,7 +125,11 @@ public class CliqueBesuControllerBuilder extends BesuControllerBuilder<CliqueCon
 
   @Override
   protected PluginServiceFactory createAdditionalPluginServices(final Blockchain blockchain) {
+<<<<<<< HEAD
     return new CliqueQueryPluginServiceFactory(blockchain);
+=======
+    return new CliqueQueryPluginServiceFactory(blockchain, nodeKeys);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Override

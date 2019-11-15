@@ -24,7 +24,10 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.permissioning.
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.permissioning.PermReloadPermissionsFromFile;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.permissioning.PermRemoveAccountsFromWhitelist;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.permissioning.PermRemoveNodesFromWhitelist;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.permissioning.AccountLocalConfigPermissioningController;
 import org.hyperledger.besu.ethereum.permissioning.NodeLocalConfigPermissioningController;
 
@@ -33,7 +36,10 @@ import java.util.Optional;
 
 public class PermJsonRpcMethods extends ApiGroupJsonRpcMethods {
 
+<<<<<<< HEAD
   private final JsonRpcParameter parameter = new JsonRpcParameter();
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   private final Optional<AccountLocalConfigPermissioningController> accountsWhitelistController;
   private final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController;
 
@@ -52,12 +58,21 @@ public class PermJsonRpcMethods extends ApiGroupJsonRpcMethods {
   @Override
   protected Map<String, JsonRpcMethod> create() {
     return mapOf(
+<<<<<<< HEAD
         new PermAddNodesToWhitelist(nodeWhitelistController, parameter),
         new PermRemoveNodesFromWhitelist(nodeWhitelistController, parameter),
         new PermGetNodesWhitelist(nodeWhitelistController),
         new PermGetAccountsWhitelist(accountsWhitelistController),
         new PermAddAccountsToWhitelist(accountsWhitelistController, parameter),
         new PermRemoveAccountsFromWhitelist(accountsWhitelistController, parameter),
+=======
+        new PermAddNodesToWhitelist(nodeWhitelistController),
+        new PermRemoveNodesFromWhitelist(nodeWhitelistController),
+        new PermGetNodesWhitelist(nodeWhitelistController),
+        new PermGetAccountsWhitelist(accountsWhitelistController),
+        new PermAddAccountsToWhitelist(accountsWhitelistController),
+        new PermRemoveAccountsFromWhitelist(accountsWhitelistController),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
         new PermReloadPermissionsFromFile(accountsWhitelistController, nodeWhitelistController));
   }
 }

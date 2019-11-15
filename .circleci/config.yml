@@ -1,23 +1,37 @@
 ---
 version: 2.1
 executors:
+<<<<<<< HEAD
   besu_executor_med:
+=======
+  besu_executor_med: # 2cpu, 4G ram
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     docker:
       - image: circleci/openjdk:11.0.4-jdk-stretch
     resource_class: medium
     working_directory: ~/project
     environment:
+<<<<<<< HEAD
       JAVA_TOOL_OPTIONS: -Xmx2048m
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2 -Xmx2048m
 
   besu_executor_xl:
+=======
+      GRADLE_OPTS: -Xmx2048m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=2
+
+  besu_executor_xl: # 8cpu, 16G ram
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     docker:
       - image: circleci/openjdk:11.0.4-jdk-stretch
     resource_class: xlarge
     working_directory: ~/project
     environment:
+<<<<<<< HEAD
       JAVA_TOOL_OPTIONS: -Xmx2048m
       GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=6 -Xmx2048m
+=======
+      GRADLE_OPTS: -Xmx4096m -Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.workers.max=4
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
 commands:
   prepare:
@@ -153,6 +167,14 @@ jobs:
           name: build image
           command: |
             ./gradlew --no-daemon distDocker
+<<<<<<< HEAD
+=======
+      - run:
+          name: test image
+          command: |
+            mkdir -p docker/reports
+            ./gradlew --no-daemon testDocker
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
   publish:
     executor: besu_executor_med
@@ -203,7 +225,11 @@ workflows:
             branches:
               only:
                 - master
+<<<<<<< HEAD
                 #- /^release-.*/
+=======
+                - /^release-.*/
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
           requires:
             - integrationTests
             - unitTests
@@ -215,7 +241,11 @@ workflows:
             branches:
               only:
                 - master
+<<<<<<< HEAD
                 #- /^release-.*/
+=======
+                - /^release-.*/
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
           requires:
             - integrationTests
             - unitTests

@@ -63,7 +63,11 @@ public class EthHashMiningCoordinatorTest {
 
     when(miner.getHashesPerSecond()).thenReturn(hashRate1, hashRate2, hashRate3);
 
+<<<<<<< HEAD
     when(executor.startAsyncMining(any(), any())).thenReturn(Optional.of(miner));
+=======
+    when(executor.startAsyncMining(any(), any(), any())).thenReturn(Optional.of(miner));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
     final EthHashMiningCoordinator miningCoordinator =
         new EthHashMiningCoordinator(executionContext.getBlockchain(), executor, syncState);

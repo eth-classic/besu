@@ -52,7 +52,11 @@ public class AbstractMiningCoordinatorTest {
 
   @Before
   public void setUp() {
+<<<<<<< HEAD
     when(minerExecutor.startAsyncMining(any(), any())).thenReturn(Optional.of(blockMiner));
+=======
+    when(minerExecutor.startAsyncMining(any(), any(), any())).thenReturn(Optional.of(blockMiner));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Test
@@ -68,7 +72,11 @@ public class AbstractMiningCoordinatorTest {
     when(syncState.isInSync()).thenReturn(true);
     miningCoordinator.enable();
     miningCoordinator.start();
+<<<<<<< HEAD
     verify(minerExecutor).startAsyncMining(any(), any());
+=======
+    verify(minerExecutor).startAsyncMining(any(), any(), any());
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     verifyNoMoreInteractions(minerExecutor, blockMiner);
   }
 
@@ -77,12 +85,16 @@ public class AbstractMiningCoordinatorTest {
     when(syncState.isInSync()).thenReturn(false);
     miningCoordinator.enable();
     miningCoordinator.start();
+<<<<<<< HEAD
     verify(minerExecutor, never()).startAsyncMining(any(), any());
+=======
+    verify(minerExecutor, never()).startAsyncMining(any(), any(), any());
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
     when(syncState.isInSync()).thenReturn(true);
     miningCoordinator.inSyncChanged(true);
 
-    verify(minerExecutor).startAsyncMining(any(), any());
+    verify(minerExecutor).startAsyncMining(any(), any(), any());
     verifyNoMoreInteractions(minerExecutor, blockMiner);
   }
 
@@ -91,7 +103,11 @@ public class AbstractMiningCoordinatorTest {
     when(syncState.isInSync()).thenReturn(true);
     miningCoordinator.enable();
     miningCoordinator.start();
+<<<<<<< HEAD
     verify(minerExecutor).startAsyncMining(any(), any());
+=======
+    verify(minerExecutor).startAsyncMining(any(), any(), any());
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
     miningCoordinator.inSyncChanged(false);
 
@@ -121,8 +137,16 @@ public class AbstractMiningCoordinatorTest {
         BlockAddedEvent.createForHeadAdvancement(BLOCK, Collections.emptyList()), blockchain);
 
     verify(blockMiner).cancel();
-    verify(minerExecutor, times(2)).startAsyncMining(any(), any());
+    verify(minerExecutor, times(2)).startAsyncMining(any(), any(), any());
 
+    verifyNoMoreInteractions(minerExecutor, blockMiner);
+  }
+
+  @Test
+  public void shouldNotStartMiningWhenBecomingInSyncIfMinerNotStarted() {
+    miningCoordinator.enable();
+    when(syncState.isInSync()).thenReturn(true);
+    miningCoordinator.inSyncChanged(true);
     verifyNoMoreInteractions(minerExecutor, blockMiner);
   }
 

@@ -15,7 +15,6 @@
 package org.hyperledger.besu.controller;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static org.hyperledger.besu.controller.KeyPairUtil.loadKeyPair;
 
 import org.hyperledger.besu.config.GenesisConfigFile;
@@ -33,6 +32,7 @@ import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.EthProtocol;
 import org.hyperledger.besu.ethereum.eth.EthProtocolConfiguration;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
+import org.hyperledger.besu.ethereum.eth.peervalidation.ClassicForkPeerValidator;
 import org.hyperledger.besu.ethereum.eth.peervalidation.DaoForkPeerValidator;
 import org.hyperledger.besu.ethereum.eth.peervalidation.PeerValidator;
 import org.hyperledger.besu.ethereum.eth.peervalidation.RequiredBlocksPeerValidator;
@@ -48,7 +48,7 @@ import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 import org.hyperledger.besu.ethereum.storage.StorageProvider;
 import org.hyperledger.besu.ethereum.worldstate.MarkSweepPruner;
 import org.hyperledger.besu.ethereum.worldstate.Pruner;
-import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
+import org.hyperledger.besu.ethereum.worldstate.PrunerConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 
@@ -64,8 +64,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalLong;
+<<<<<<< HEAD
 
 public abstract class BesuControllerBuilder<C> {
+=======
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+public abstract class BesuControllerBuilder<C> {
+  private static final Logger LOG = LogManager.getLogger();
+
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   protected GenesisConfigFile genesisConfig;
   SynchronizerConfiguration syncConfig;
   EthProtocolConfiguration ethereumWireProtocolConfiguration;
@@ -81,7 +91,7 @@ public abstract class BesuControllerBuilder<C> {
   GasLimitCalculator gasLimitCalculator;
   private StorageProvider storageProvider;
   private boolean isPruningEnabled;
-  private PruningConfiguration pruningConfiguration;
+  private PrunerConfiguration prunerConfiguration;
   Map<String, String> genesisConfigOverrides;
   private Map<Long, Hash> requiredBlocks = Collections.emptyMap();
 
@@ -165,8 +175,8 @@ public abstract class BesuControllerBuilder<C> {
   }
 
   public BesuControllerBuilder<C> pruningConfiguration(
-      final PruningConfiguration pruningConfiguration) {
-    this.pruningConfiguration = pruningConfiguration;
+      final PrunerConfiguration prunerConfiguration) {
+    this.prunerConfiguration = prunerConfiguration;
     return this;
   }
 
@@ -218,6 +228,7 @@ public abstract class BesuControllerBuilder<C> {
 
     Optional<Pruner> maybePruner = Optional.empty();
     if (isPruningEnabled) {
+<<<<<<< HEAD
       checkState(
           storageProvider.isWorldStateIterable(),
           "Cannot enable pruning with current database version. Resync to get the latest version.");
@@ -231,6 +242,23 @@ public abstract class BesuControllerBuilder<C> {
                       metricsSystem),
                   blockchain,
                   pruningConfiguration));
+=======
+      if (!storageProvider.isWorldStateIterable()) {
+        LOG.warn(
+            "Cannot enable pruning with current database version. Disabling. Resync to get the latest database version or disable pruning explicitly on the command line to remove this warning.");
+      } else {
+        maybePruner =
+            Optional.of(
+                new Pruner(
+                    new MarkSweepPruner(
+                        protocolContext.getWorldStateArchive().getWorldStateStorage(),
+                        blockchain,
+                        storageProvider.createPruningStorage(),
+                        metricsSystem),
+                    blockchain,
+                    prunerConfiguration));
+      }
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     }
 
     final boolean fastSyncEnabled = syncConfig.getSyncMode().equals(SyncMode.FAST);
@@ -299,6 +327,10 @@ public abstract class BesuControllerBuilder<C> {
         transactionPool,
         miningCoordinator,
         privacyParameters,
+<<<<<<< HEAD
+=======
+        miningParameters,
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
         additionalJsonRpcMethodFactory,
         nodeKeys,
         closeables,
@@ -359,6 +391,14 @@ public abstract class BesuControllerBuilder<C> {
       // Setup dao validator
       validators.add(
           new DaoForkPeerValidator(protocolSchedule, metricsSystem, daoBlock.getAsLong()));
+    }
+
+    final OptionalLong classicBlock =
+        genesisConfig.getConfigOptions(genesisConfigOverrides).getClassicForkBlock();
+    // setup classic validator
+    if (classicBlock.isPresent()) {
+      validators.add(
+          new ClassicForkPeerValidator(protocolSchedule, metricsSystem, classicBlock.getAsLong()));
     }
 
     for (final Map.Entry<Long, Hash> requiredBlock : requiredBlocks.entrySet()) {

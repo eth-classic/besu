@@ -70,7 +70,11 @@ public class LogsSubscriptionServiceTest {
   @Before
   public void before() {
     logsSubscriptionService = new LogsSubscriptionService(subscriptionManager);
+<<<<<<< HEAD
     blockchain.observeBlockAdded(logsSubscriptionService);
+=======
+    blockchain.observeLogs(logsSubscriptionService);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Test

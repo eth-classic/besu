@@ -16,7 +16,10 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
@@ -29,17 +32,13 @@ import com.google.common.base.Suppliers;
 public abstract class AbstractBlockParameterMethod implements JsonRpcMethod {
 
   private final Supplier<BlockchainQueries> blockchainQueries;
-  private final JsonRpcParameter parameters;
 
-  protected AbstractBlockParameterMethod(
-      final BlockchainQueries blockchainQueries, final JsonRpcParameter parameters) {
-    this(Suppliers.ofInstance(blockchainQueries), parameters);
+  protected AbstractBlockParameterMethod(final BlockchainQueries blockchainQueries) {
+    this(Suppliers.ofInstance(blockchainQueries));
   }
 
-  protected AbstractBlockParameterMethod(
-      final Supplier<BlockchainQueries> blockchainQueries, final JsonRpcParameter parameters) {
+  protected AbstractBlockParameterMethod(final Supplier<BlockchainQueries> blockchainQueries) {
     this.blockchainQueries = blockchainQueries;
-    this.parameters = parameters;
   }
 
   protected abstract BlockParameter blockParameter(JsonRpcRequest request);
@@ -48,10 +47,6 @@ public abstract class AbstractBlockParameterMethod implements JsonRpcMethod {
 
   protected BlockchainQueries getBlockchainQueries() {
     return blockchainQueries.get();
-  }
-
-  protected JsonRpcParameter getParameters() {
-    return parameters;
   }
 
   protected Object pendingResult(final JsonRpcRequest request) {

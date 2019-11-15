@@ -69,7 +69,11 @@ public class PrunerTest {
         new Pruner(
             markSweepPruner,
             blockchain,
+<<<<<<< HEAD
             new PruningConfiguration(0, 1),
+=======
+            new PrunerConfiguration(0, 1),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
             mockExecutorServiceSupplier);
     pruner.start();
 
@@ -94,7 +98,11 @@ public class PrunerTest {
         new Pruner(
             markSweepPruner,
             blockchain,
+<<<<<<< HEAD
             new PruningConfiguration(1, 2),
+=======
+            new PrunerConfiguration(1, 2),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
             mockExecutorServiceSupplier);
     pruner.start();
 
@@ -125,7 +133,11 @@ public class PrunerTest {
         new Pruner(
             markSweepPruner,
             blockchain,
+<<<<<<< HEAD
             new PruningConfiguration(0, 1),
+=======
+            new PrunerConfiguration(0, 1),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
             mockExecutorServiceSupplier);
     pruner.start();
 
@@ -165,7 +177,11 @@ public class PrunerTest {
                 new Pruner(
                     markSweepPruner,
                     mockchain,
+<<<<<<< HEAD
                     new PruningConfiguration(-1, -2),
+=======
+                    new PrunerConfiguration(-1, -2),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
                     mockExecutorServiceSupplier))
         .isInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(
@@ -173,7 +189,11 @@ public class PrunerTest {
                 new Pruner(
                     markSweepPruner,
                     mockchain,
+<<<<<<< HEAD
                     new PruningConfiguration(10, 8),
+=======
+                    new PrunerConfiguration(10, 8),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
                     mockExecutorServiceSupplier))
         .isInstanceOf(IllegalArgumentException.class);
     assertThatThrownBy(
@@ -181,7 +201,11 @@ public class PrunerTest {
                 new Pruner(
                     markSweepPruner,
                     mockchain,
+<<<<<<< HEAD
                     new PruningConfiguration(10, 10),
+=======
+                    new PrunerConfiguration(10, 10),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
                     mockExecutorServiceSupplier))
         .isInstanceOf(IllegalArgumentException.class);
   }
@@ -198,7 +222,11 @@ public class PrunerTest {
         new Pruner(
             markSweepPruner,
             blockchain,
+<<<<<<< HEAD
             new PruningConfiguration(0, 1),
+=======
+            new PrunerConfiguration(0, 1),
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
             mockExecutorServiceSupplier);
     pruner.start();
     pruner.stop();

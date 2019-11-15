@@ -16,7 +16,10 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResult;
@@ -28,15 +31,11 @@ public class EthGetBlockByHash implements JsonRpcMethod {
 
   private final BlockResultFactory blockResult;
   private final BlockchainQueries blockchain;
-  private final JsonRpcParameter parameters;
 
   public EthGetBlockByHash(
-      final BlockchainQueries blockchain,
-      final BlockResultFactory blockResult,
-      final JsonRpcParameter parameters) {
+      final BlockchainQueries blockchain, final BlockResultFactory blockResult) {
     this.blockchain = blockchain;
     this.blockResult = blockResult;
-    this.parameters = parameters;
   }
 
   @Override
@@ -50,7 +49,7 @@ public class EthGetBlockByHash implements JsonRpcMethod {
   }
 
   private BlockResult blockResult(final JsonRpcRequest request) {
-    final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
+    final Hash hash = request.getRequiredParameter(0, Hash.class);
 
     if (isCompleteTransactions(request)) {
       return transactionComplete(hash);
@@ -71,6 +70,6 @@ public class EthGetBlockByHash implements JsonRpcMethod {
   }
 
   private boolean isCompleteTransactions(final JsonRpcRequest request) {
-    return parameters.required(request.getParams(), 1, Boolean.class);
+    return request.getRequiredParameter(1, Boolean.class);
   }
 }

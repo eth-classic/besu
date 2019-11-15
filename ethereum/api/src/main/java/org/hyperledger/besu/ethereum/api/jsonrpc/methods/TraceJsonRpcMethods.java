@@ -17,7 +17,10 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.methods;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.TraceReplayBlockTransactions;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockReplay;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
@@ -27,7 +30,10 @@ import java.util.Map;
 
 public class TraceJsonRpcMethods extends ApiGroupJsonRpcMethods {
 
+<<<<<<< HEAD
   private final JsonRpcParameter parameter = new JsonRpcParameter();
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   private final BlockchainQueries blockchainQueries;
   private final ProtocolSchedule<?> protocolSchedule;
 
@@ -48,7 +54,10 @@ public class TraceJsonRpcMethods extends ApiGroupJsonRpcMethods {
   protected Map<String, JsonRpcMethod> create() {
     return mapOf(
         new TraceReplayBlockTransactions(
+<<<<<<< HEAD
             parameter,
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
             new BlockTracer(
                 new BlockReplay(
                     protocolSchedule,

@@ -15,6 +15,7 @@
 package org.hyperledger.besu.ethereum.blockcreation;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.chain.EthHashObserver;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -31,6 +32,7 @@ import java.util.function.Function;
 public class EthHashMinerExecutor extends AbstractMinerExecutor<Void, EthHashBlockMiner> {
 
   private volatile Optional<Address> coinbase;
+  private boolean stratumMiningEnabled;
 
   public EthHashMinerExecutor(
       final ProtocolContext<Void> protocolContext,
@@ -51,18 +53,38 @@ public class EthHashMinerExecutor extends AbstractMinerExecutor<Void, EthHashBlo
 
   @Override
   public Optional<EthHashBlockMiner> startAsyncMining(
+<<<<<<< HEAD
       final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader) {
     if (!coinbase.isPresent()) {
       throw new CoinbaseNotSetException("Unable to start mining without a coinbase.");
     }
     return super.startAsyncMining(observers, parentHeader);
+=======
+      final Subscribers<MinedBlockObserver> observers,
+      final Subscribers<EthHashObserver> ethHashObservers,
+      final BlockHeader parentHeader) {
+    if (!coinbase.isPresent()) {
+      throw new CoinbaseNotSetException("Unable to start mining without a coinbase.");
+    }
+    return super.startAsyncMining(observers, ethHashObservers, parentHeader);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Override
   public EthHashBlockMiner createMiner(
+<<<<<<< HEAD
       final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader) {
+=======
+      final Subscribers<MinedBlockObserver> observers,
+      final Subscribers<EthHashObserver> ethHashObservers,
+      final BlockHeader parentHeader) {
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     final EthHashSolver solver =
-        new EthHashSolver(new RandomNonceGenerator(), new EthHasher.Light());
+        new EthHashSolver(
+            new RandomNonceGenerator(),
+            new EthHasher.Light(),
+            stratumMiningEnabled,
+            ethHashObservers);
     final Function<BlockHeader, EthHashBlockCreator> blockCreator =
         (header) ->
             new EthHashBlockCreator(
@@ -86,6 +108,10 @@ public class EthHashMinerExecutor extends AbstractMinerExecutor<Void, EthHashBlo
     } else {
       this.coinbase = Optional.of(coinbase.copy());
     }
+  }
+
+  void setStratumMiningEnabled(final boolean stratumMiningEnabled) {
+    this.stratumMiningEnabled = stratumMiningEnabled;
   }
 
   @Override

@@ -57,6 +57,17 @@ public interface GenesisConfigOptions {
   OptionalLong getIstanbulBlockNumber();
 
   /**
+<<<<<<< HEAD
+=======
+   * Block number for the Dao Fork, this value is used to tell node to connect with peer that did
+   * NOT accept the Dao Fork and instead continued as what is now called the classic network
+   *
+   * @return block number to activate the classic fork block
+   */
+  OptionalLong getClassicForkBlock();
+
+  /**
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
    * Block number for ECIP-1015 fork on Classic network ECIP-1015: Long-term gas cost changes for
    * IO-heavy operations to mitigate transaction spam attacks In reference to EIP-150 (ETH Tangerine
    * Whistle) Note, this fork happens after Homestead (Mainnet definition) and before DieHard fork
@@ -81,6 +92,7 @@ public interface GenesisConfigOptions {
    */
   OptionalLong getDieHardBlockNumber();
 
+<<<<<<< HEAD
   // TODO edwardmack, Add gotham fork block number here
 
   /**
@@ -91,6 +103,29 @@ public interface GenesisConfigOptions {
    * @see <a
    *     href="https://ecips.ethereumclassic.org/ECIPs/ecip-1041">https://ecips.ethereumclassic.org/ECIPs/ecip-1041</a>
    * @return block number to activate Defuse Difficulty Bomb fork on Classic
+=======
+  /**
+   * Block number for Gotham fork on Classic network, the Gotham form includes changes to meet
+   * specification for ECIP-1017 and ECIP-1039 both regarding Monetary Policy (rewards).
+   *
+   * @see <a
+   *     href="https://ecips.ethereumclassic.org/ECIPs/ecip-1017">https://ecips.ethereumclassic.org/ECIPs/ecip-1017</a>
+   *     ECIP-1017: Monetary Policy and Final Modification to the Ethereum Classic Emission Schedule
+   * @see <a
+   *     href="https://ecips.ethereumclassic.org/ECIPs/ecip-1039">https://ecips.ethereumclassic.org/ECIPs/ecip-1039</a>
+   *     ECIP-1039: Monetary policy rounding specification
+   * @return block to activate Classic Gotham fork
+   */
+  OptionalLong getGothamBlockNumber();
+
+  /**
+   * Block number to remove difficulty bomb, to meet specification for ECIP-1041.
+   *
+   * @see <a
+   *     href="https://ecips.ethereumclassic.org/ECIPs/ecip-1041">https://ecips.ethereumclassic.org/ECIPs/ecip-1041</a>
+   *     ECIP-1041: Remove Difficulty Bomb
+   * @return block number to remove difficulty bomb on classic network
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
    */
   OptionalLong getDefuseDifficultyBombBlockNumber();
 
@@ -106,6 +141,7 @@ public interface GenesisConfigOptions {
    */
   OptionalLong getAtlantisBlockNumber();
 
+<<<<<<< HEAD
   /**
    * Block number for Agharta fork on Classic network Note, this fork happen after Atlantis fork
    * ECIP-1056: Agharta EVM and Protocol Upgrades Enable the outstanding Ethereum Foundation
@@ -117,6 +153,8 @@ public interface GenesisConfigOptions {
    */
   OptionalLong getAghartaBlockNumber();
 
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   Optional<BigInteger> getChainId();
 
   OptionalInt getContractSizeLimit();
@@ -124,4 +162,6 @@ public interface GenesisConfigOptions {
   OptionalInt getEvmStackSize();
 
   Map<String, Object> asMap();
+
+  CustomForksConfigOptions getCustomForks();
 }

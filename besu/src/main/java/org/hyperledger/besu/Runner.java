@@ -20,6 +20,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcHttpService;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketService;
 import org.hyperledger.besu.ethereum.p2p.network.NetworkRunner;
 import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
+import org.hyperledger.besu.ethereum.stratum.StratumServer;
 import org.hyperledger.besu.metrics.prometheus.MetricsService;
 import org.hyperledger.besu.nat.upnp.UpnpNatManager;
 
@@ -56,6 +57,7 @@ public class Runner implements AutoCloseable {
 
   private final BesuController<?> besuController;
   private final Path dataDir;
+  private final Optional<StratumServer> stratumServer;
 
   Runner(
       final Vertx vertx,
@@ -64,6 +66,7 @@ public class Runner implements AutoCloseable {
       final Optional<JsonRpcHttpService> jsonRpc,
       final Optional<GraphQLHttpService> graphQLHttp,
       final Optional<WebSocketService> websocketRpc,
+      final Optional<StratumServer> stratumServer,
       final Optional<MetricsService> metrics,
       final BesuController<?> besuController,
       final Path dataDir) {
@@ -76,6 +79,7 @@ public class Runner implements AutoCloseable {
     this.metrics = metrics;
     this.besuController = besuController;
     this.dataDir = dataDir;
+    this.stratumServer = stratumServer;
   }
 
   public void start() {
@@ -87,6 +91,10 @@ public class Runner implements AutoCloseable {
         besuController.getSynchronizer().start();
       }
       besuController.getMiningCoordinator().start();
+<<<<<<< HEAD
+=======
+      stratumServer.ifPresent(server -> waitForServiceToStart("stratum", server.start()));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       vertx.setPeriodic(
           TimeUnit.MINUTES.toMillis(1),
           time ->
@@ -111,6 +119,10 @@ public class Runner implements AutoCloseable {
 
     besuController.getMiningCoordinator().stop();
     waitForServiceToStop("Mining Coordinator", besuController.getMiningCoordinator()::awaitStop);
+<<<<<<< HEAD
+=======
+    stratumServer.ifPresent(server -> waitForServiceToStop("Stratum", server::stop));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     if (networkRunner.getNetwork().isP2pEnabled()) {
       besuController.getSynchronizer().stop();
       waitForServiceToStop("Synchronizer", besuController.getSynchronizer()::awaitStop);

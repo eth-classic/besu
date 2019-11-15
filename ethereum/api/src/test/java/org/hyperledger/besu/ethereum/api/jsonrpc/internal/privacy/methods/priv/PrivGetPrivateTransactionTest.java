@@ -25,7 +25,10 @@ import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy.PrivateTransactionGroupResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy.PrivateTransactionLegacyResult;
@@ -91,7 +94,6 @@ public class PrivGetPrivateTransactionTest {
   private final String enclaveKey =
       BytesValues.fromBase64("93Ky7lXwFkMc7+ckoFgUMku5bpr9tz4zhmWmk9RlNng=").toString();
 
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final Enclave enclave = mock(Enclave.class);
 
   private final PrivacyParameters privacyParameters = mock(PrivacyParameters.class);
@@ -119,7 +121,7 @@ public class PrivGetPrivateTransactionTest {
         new PrivateTransactionLegacyResult(privateTransaction);
 
     final PrivGetPrivateTransaction privGetPrivateTransaction =
-        new PrivGetPrivateTransaction(blockchain, enclave, parameters, privacyParameters);
+        new PrivGetPrivateTransaction(blockchain, enclave, privacyParameters);
     final Object[] params = new Object[] {enclaveKey};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getPrivateTransaction", params);
 
@@ -152,7 +154,7 @@ public class PrivGetPrivateTransactionTest {
         new PrivateTransactionGroupResult(privateTransaction);
 
     final PrivGetPrivateTransaction privGetPrivateTransaction =
-        new PrivGetPrivateTransaction(blockchain, enclave, parameters, privacyParameters);
+        new PrivGetPrivateTransaction(blockchain, enclave, privacyParameters);
 
     final Object[] params = new Object[] {enclaveKey};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getPrivateTransaction", params);

@@ -155,6 +155,11 @@ public class EthNetworkConfig {
         return jsonConfig(DEV_GENESIS);
       case CLASSIC:
         return jsonConfig(CLASSIC_GENESIS);
+<<<<<<< HEAD
+=======
+      case KOTTI:
+        return jsonConfig(KOTTI_GENESIS);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       default:
         throw new IllegalArgumentException("Unknown network:" + network);
     }

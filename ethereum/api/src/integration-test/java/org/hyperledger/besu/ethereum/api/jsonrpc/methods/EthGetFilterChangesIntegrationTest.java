@@ -28,7 +28,10 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterIdGenerat
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterRepository;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.EthGetFilterChanges;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -89,7 +92,6 @@ public class EthGetFilterChangesIntegrationTest {
   private static final int MAX_TRANSACTIONS = 5;
   private static final KeyPair keyPair = KeyPair.generate();
   private final Transaction transaction = createTransaction(1);
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private FilterManager filterManager;
   private EthGetFilterChanges method;
   private final SyncState syncState = mock(SyncState.class);
@@ -121,7 +123,7 @@ public class EthGetFilterChangesIntegrationTest {
     filterManager =
         new FilterManager(
             blockchainQueries, transactionPool, new FilterIdGenerator(), new FilterRepository());
-    method = new EthGetFilterChanges(filterManager, parameters);
+    method = new EthGetFilterChanges(filterManager);
   }
 
   @Test

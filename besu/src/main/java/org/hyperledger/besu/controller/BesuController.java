@@ -23,6 +23,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.methods.JsonRpcMethods;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
@@ -58,6 +59,10 @@ public class BesuController<C> implements java.io.Closeable {
   private final MiningCoordinator miningCoordinator;
   private final PrivacyParameters privacyParameters;
   private final List<Closeable> closeables;
+<<<<<<< HEAD
+=======
+  private final MiningParameters miningParameters;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   private final PluginServiceFactory additionalPluginServices;
   private final SyncState syncState;
 
@@ -72,6 +77,10 @@ public class BesuController<C> implements java.io.Closeable {
       final TransactionPool transactionPool,
       final MiningCoordinator miningCoordinator,
       final PrivacyParameters privacyParameters,
+<<<<<<< HEAD
+=======
+      final MiningParameters miningParameters,
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       final JsonRpcMethods additionalJsonRpcMethodsFactory,
       final KeyPair keyPair,
       final List<Closeable> closeables,
@@ -89,6 +98,10 @@ public class BesuController<C> implements java.io.Closeable {
     this.miningCoordinator = miningCoordinator;
     this.privacyParameters = privacyParameters;
     this.closeables = closeables;
+<<<<<<< HEAD
+=======
+    this.miningParameters = miningParameters;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     this.additionalPluginServices = additionalPluginServices;
   }
 
@@ -143,6 +156,10 @@ public class BesuController<C> implements java.io.Closeable {
 
   public PrivacyParameters getPrivacyParameters() {
     return privacyParameters;
+  }
+
+  public MiningParameters getMiningParameters() {
+    return miningParameters;
   }
 
   public Map<String, JsonRpcMethod> getAdditionalJsonRpcMethods(

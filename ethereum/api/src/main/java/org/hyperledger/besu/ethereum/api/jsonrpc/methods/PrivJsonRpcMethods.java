@@ -18,7 +18,10 @@ import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApis;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.privacy.methods.priv.PrivCreatePrivacyGroup;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.privacy.methods.priv.PrivDeletePrivacyGroup;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.privacy.methods.priv.PrivDistributeRawTransaction;
@@ -37,8 +40,11 @@ import java.util.Map;
 
 public class PrivJsonRpcMethods extends PrivacyApiGroupJsonRpcMethods {
 
+<<<<<<< HEAD
   private final JsonRpcParameter parameter = new JsonRpcParameter();
 
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   public PrivJsonRpcMethods(
       final BlockchainQueries blockchainQueries,
       final ProtocolSchedule<?> protocolSchedule,
@@ -56,6 +62,7 @@ public class PrivJsonRpcMethods extends PrivacyApiGroupJsonRpcMethods {
   protected Map<String, JsonRpcMethod> create(
       final PrivateTransactionHandler privateTransactionHandler, final Enclave enclave) {
     return mapOf(
+<<<<<<< HEAD
         new PrivGetTransactionReceipt(
             getBlockchainQueries(), enclave, parameter, getPrivacyParameters()),
         new PrivCreatePrivacyGroup(
@@ -69,5 +76,17 @@ public class PrivJsonRpcMethods extends PrivacyApiGroupJsonRpcMethods {
             getBlockchainQueries(), enclave, parameter, getPrivacyParameters()),
         new PrivDistributeRawTransaction(
             privateTransactionHandler, getTransactionPool(), parameter));
+=======
+        new PrivGetTransactionReceipt(getBlockchainQueries(), enclave, getPrivacyParameters()),
+        new PrivCreatePrivacyGroup(
+            new Enclave(getPrivacyParameters().getEnclaveUri()), getPrivacyParameters()),
+        new PrivDeletePrivacyGroup(
+            new Enclave(getPrivacyParameters().getEnclaveUri()), getPrivacyParameters()),
+        new PrivFindPrivacyGroup(new Enclave(getPrivacyParameters().getEnclaveUri())),
+        new PrivGetPrivacyPrecompileAddress(getPrivacyParameters()),
+        new PrivGetTransactionCount(privateTransactionHandler),
+        new PrivGetPrivateTransaction(getBlockchainQueries(), enclave, getPrivacyParameters()),
+        new PrivDistributeRawTransaction(privateTransactionHandler, getTransactionPool()));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 }

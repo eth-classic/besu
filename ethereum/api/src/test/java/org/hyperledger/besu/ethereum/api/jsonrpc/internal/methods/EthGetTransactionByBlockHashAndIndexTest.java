@@ -19,7 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.crypto.Hash;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.Quantity;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
@@ -38,7 +41,7 @@ public class EthGetTransactionByBlockHashAndIndexTest {
 
   @Test
   public void shouldReturnNullWhenBlockHashDoesNotExist() {
-    method = new EthGetTransactionByBlockHashAndIndex(blockchain, new JsonRpcParameter());
+    method = new EthGetTransactionByBlockHashAndIndex(blockchain);
     Bytes32 hash = Hash.keccak256(BytesValue.wrap("horse".getBytes(UTF_8)));
     JsonRpcSuccessResponse response = (JsonRpcSuccessResponse) method.response(request(hash, 1));
     assertThat(response.getResult()).isEqualTo(null);

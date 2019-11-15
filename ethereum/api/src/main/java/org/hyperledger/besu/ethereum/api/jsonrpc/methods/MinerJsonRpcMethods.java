@@ -21,14 +21,20 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.miner.MinerSet
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.miner.MinerSetEtherbase;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.miner.MinerStart;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.miner.MinerStop;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 
 import java.util.Map;
 
 public class MinerJsonRpcMethods extends ApiGroupJsonRpcMethods {
 
+<<<<<<< HEAD
   private final JsonRpcParameter parameter = new JsonRpcParameter();
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   private final MiningCoordinator miningCoordinator;
 
   public MinerJsonRpcMethods(final MiningCoordinator miningCoordinator) {
@@ -42,7 +48,11 @@ public class MinerJsonRpcMethods extends ApiGroupJsonRpcMethods {
 
   @Override
   protected Map<String, JsonRpcMethod> create() {
+<<<<<<< HEAD
     final MinerSetCoinbase minerSetCoinbase = new MinerSetCoinbase(miningCoordinator, parameter);
+=======
+    final MinerSetCoinbase minerSetCoinbase = new MinerSetCoinbase(miningCoordinator);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     return mapOf(
         new MinerStart(miningCoordinator),
         new MinerStop(miningCoordinator),

@@ -17,6 +17,10 @@ package org.hyperledger.besu.controller;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
 import org.hyperledger.besu.consensus.ibft.queries.IbftQueryServiceImpl;
+<<<<<<< HEAD
+=======
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.plugin.services.metrics.PoAMetricsService;
 import org.hyperledger.besu.plugin.services.query.IbftQueryService;
@@ -25,17 +29,32 @@ import org.hyperledger.besu.services.BesuPluginContextImpl;
 
 public class IbftQueryPluginServiceFactory implements PluginServiceFactory {
 
+<<<<<<< HEAD
   final Blockchain blockchain;
 
   public IbftQueryPluginServiceFactory(final Blockchain blockchain) {
     this.blockchain = blockchain;
+=======
+  private final Blockchain blockchain;
+  private final KeyPair localNodeKeypair;
+
+  public IbftQueryPluginServiceFactory(
+      final Blockchain blockchain, final KeyPair localNodeKeypair) {
+    this.blockchain = blockchain;
+    this.localNodeKeypair = localNodeKeypair;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Override
   public void appendPluginServices(final BesuPluginContextImpl besuContext) {
     final BlockInterface blockInterface = new IbftBlockInterface();
 
+<<<<<<< HEAD
     final IbftQueryServiceImpl service = new IbftQueryServiceImpl(blockInterface, blockchain);
+=======
+    final IbftQueryServiceImpl service =
+        new IbftQueryServiceImpl(blockInterface, blockchain, localNodeKeypair);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     besuContext.addService(IbftQueryService.class, service);
     besuContext.addService(PoaQueryService.class, service);
     besuContext.addService(PoAMetricsService.class, service);

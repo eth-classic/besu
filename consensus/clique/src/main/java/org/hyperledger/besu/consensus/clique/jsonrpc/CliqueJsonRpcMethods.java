@@ -29,7 +29,10 @@ import org.hyperledger.besu.consensus.common.VoteTallyUpdater;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+<<<<<<< HEAD:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
 import org.hyperledger.besu.ethereum.api.jsonrpc.methods.ApiGroupJsonRpcMethods;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
@@ -38,8 +41,11 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import java.util.Map;
 
 public class CliqueJsonRpcMethods extends ApiGroupJsonRpcMethods {
+<<<<<<< HEAD:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
 
   private final JsonRpcParameter parameter = new JsonRpcParameter();
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
   private final ProtocolContext<CliqueContext> context;
 
   public CliqueJsonRpcMethods(final ProtocolContext<CliqueContext> context) {
@@ -63,12 +69,21 @@ public class CliqueJsonRpcMethods extends ApiGroupJsonRpcMethods {
     final VoteTallyCache voteTallyCache = createVoteTallyCache(context, blockchain);
 
     return mapOf(
+<<<<<<< HEAD:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
         new CliqueGetSigners(blockchainQueries, voteTallyCache, parameter),
         new CliqueGetSignersAtHash(blockchainQueries, voteTallyCache, parameter),
         new Propose(voteProposer, parameter),
         new Discard(voteProposer, parameter),
         new CliqueProposals(voteProposer),
         new CliqueGetSignerMetrics(new CliqueBlockInterface(), blockchainQueries, parameter));
+=======
+        new CliqueGetSigners(blockchainQueries, voteTallyCache),
+        new CliqueGetSignersAtHash(blockchainQueries, voteTallyCache),
+        new Propose(voteProposer),
+        new Discard(voteProposer),
+        new CliqueProposals(voteProposer),
+        new CliqueGetSignerMetrics(new CliqueBlockInterface(), blockchainQueries));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27:consensus/clique/src/main/java/org/hyperledger/besu/consensus/clique/jsonrpc/CliqueJsonRpcMethods.java
   }
 
   private VoteTallyCache createVoteTallyCache(

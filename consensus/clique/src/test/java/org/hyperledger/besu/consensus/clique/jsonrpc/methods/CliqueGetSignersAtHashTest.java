@@ -25,7 +25,10 @@ import org.hyperledger.besu.consensus.common.VoteTally;
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -67,7 +70,7 @@ public class CliqueGetSignersAtHashTest {
 
   @Before
   public void setup() {
-    method = new CliqueGetSignersAtHash(blockchainQueries, voteTallyCache, new JsonRpcParameter());
+    method = new CliqueGetSignersAtHash(blockchainQueries, voteTallyCache);
 
     final byte[] genesisBlockExtraData =
         Hex.decode(

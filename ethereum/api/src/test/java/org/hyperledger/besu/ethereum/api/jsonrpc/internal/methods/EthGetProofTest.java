@@ -22,7 +22,10 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -56,8 +59,6 @@ public class EthGetProofTest {
 
   @Mock private BlockchainQueries blockchainQueries;
 
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
-
   private EthGetProof method;
   private final String JSON_RPC_VERSION = "2.0";
   private final String ETH_METHOD = "eth_getProof";
@@ -70,7 +71,7 @@ public class EthGetProofTest {
 
   @Before
   public void setUp() {
-    method = new EthGetProof(blockchainQueries, parameters);
+    method = new EthGetProof(blockchainQueries);
   }
 
   @Test

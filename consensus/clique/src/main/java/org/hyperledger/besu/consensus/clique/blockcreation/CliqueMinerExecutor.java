@@ -23,6 +23,7 @@ import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.blockcreation.AbstractBlockScheduler;
 import org.hyperledger.besu.ethereum.blockcreation.AbstractMinerExecutor;
+import org.hyperledger.besu.ethereum.chain.EthHashObserver;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -69,7 +70,13 @@ public class CliqueMinerExecutor extends AbstractMinerExecutor<CliqueContext, Cl
 
   @Override
   public CliqueBlockMiner createMiner(
+<<<<<<< HEAD
       final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader) {
+=======
+      final Subscribers<MinedBlockObserver> observers,
+      final Subscribers<EthHashObserver> ethHashObservers,
+      final BlockHeader parentHeader) {
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     final Function<BlockHeader, CliqueBlockCreator> blockCreator =
         (header) ->
             new CliqueBlockCreator(

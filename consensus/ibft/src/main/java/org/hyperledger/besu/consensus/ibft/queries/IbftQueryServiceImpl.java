@@ -18,6 +18,10 @@ import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.PoaQueryServiceImpl;
 import org.hyperledger.besu.consensus.ibft.IbftBlockHashing;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
+<<<<<<< HEAD
+=======
+import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
@@ -30,8 +34,14 @@ import java.util.Collections;
 
 public class IbftQueryServiceImpl extends PoaQueryServiceImpl implements IbftQueryService {
 
+<<<<<<< HEAD
   public IbftQueryServiceImpl(final BlockInterface blockInterface, final Blockchain blockchain) {
     super(blockInterface, blockchain);
+=======
+  public IbftQueryServiceImpl(
+      final BlockInterface blockInterface, final Blockchain blockchain, final KeyPair keyPair) {
+    super(blockInterface, blockchain, keyPair);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   @Override

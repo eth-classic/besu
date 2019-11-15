@@ -15,6 +15,7 @@
 package org.hyperledger.besu.ethereum.blockcreation;
 
 import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.chain.EthHashObserver;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
@@ -70,9 +71,17 @@ public abstract class AbstractMinerExecutor<
   }
 
   public Optional<M> startAsyncMining(
+<<<<<<< HEAD
       final Subscribers<MinedBlockObserver> observers, final BlockHeader parentHeader) {
     try {
       final M currentRunningMiner = createMiner(observers, parentHeader);
+=======
+      final Subscribers<MinedBlockObserver> observers,
+      final Subscribers<EthHashObserver> ethHashObservers,
+      final BlockHeader parentHeader) {
+    try {
+      final M currentRunningMiner = createMiner(observers, ethHashObservers, parentHeader);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       executorService.execute(currentRunningMiner);
       return Optional.of(currentRunningMiner);
     } catch (RejectedExecutionException e) {
@@ -94,7 +103,13 @@ public abstract class AbstractMinerExecutor<
   }
 
   public abstract M createMiner(
+<<<<<<< HEAD
       final Subscribers<MinedBlockObserver> subscribers, final BlockHeader parentHeader);
+=======
+      final Subscribers<MinedBlockObserver> subscribers,
+      final Subscribers<EthHashObserver> ethHashObservers,
+      final BlockHeader parentHeader);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
   public void setExtraData(final BytesValue extraData) {
     this.extraData = extraData.copy();

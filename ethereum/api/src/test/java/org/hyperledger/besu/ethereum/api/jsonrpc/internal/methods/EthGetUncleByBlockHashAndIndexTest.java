@@ -22,7 +22,10 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.crypto.SECP256K1.KeyPair;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResult;
@@ -62,7 +65,7 @@ public class EthGetUncleByBlockHashAndIndexTest {
 
   @Before
   public void before() {
-    this.method = new EthGetUncleByBlockHashAndIndex(blockchainQueries, new JsonRpcParameter());
+    this.method = new EthGetUncleByBlockHashAndIndex(blockchainQueries);
   }
 
   @Test

@@ -17,7 +17,10 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResultFactory;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
@@ -32,18 +35,15 @@ public class EthGetBlockByNumber extends AbstractBlockParameterMethod {
   private final boolean includeCoinbase;
 
   public EthGetBlockByNumber(
-      final BlockchainQueries blockchain,
-      final BlockResultFactory blockResult,
-      final JsonRpcParameter parameters) {
-    this(Suppliers.ofInstance(blockchain), blockResult, parameters, false);
+      final BlockchainQueries blockchain, final BlockResultFactory blockResult) {
+    this(Suppliers.ofInstance(blockchain), blockResult, false);
   }
 
   public EthGetBlockByNumber(
       final Supplier<BlockchainQueries> blockchain,
       final BlockResultFactory blockResult,
-      final JsonRpcParameter parameters,
       final boolean includeCoinbase) {
-    super(blockchain, parameters);
+    super(blockchain);
     this.blockResult = blockResult;
     this.includeCoinbase = includeCoinbase;
   }
@@ -55,7 +55,7 @@ public class EthGetBlockByNumber extends AbstractBlockParameterMethod {
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return getParameters().required(request.getParams(), 0, BlockParameter.class);
+    return request.getRequiredParameter(0, BlockParameter.class);
   }
 
   @Override
@@ -82,6 +82,6 @@ public class EthGetBlockByNumber extends AbstractBlockParameterMethod {
   }
 
   private boolean isCompleteTransactions(final JsonRpcRequest request) {
-    return getParameters().required(request.getParams(), 1, Boolean.class);
+    return request.getRequiredParameter(1, Boolean.class);
   }
 }

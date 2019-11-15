@@ -19,6 +19,7 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.chain.EthHashObserver;
 import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -48,6 +49,7 @@ public abstract class AbstractMiningCoordinator<
   private static final Logger LOG = getLogger();
 
   private final Subscribers<MinedBlockObserver> minedBlockObservers = Subscribers.create();
+  private final Subscribers<EthHashObserver> ethHashObservers = Subscribers.create();
   private final AbstractMinerExecutor<C, M> executor;
   private final SyncState syncState;
   private final Blockchain blockchain;
@@ -72,7 +74,11 @@ public abstract class AbstractMiningCoordinator<
       final BlockHeader parentHeader,
       final List<Transaction> transactions,
       final List<BlockHeader> ommers) {
+<<<<<<< HEAD
     final M miner = executor.createMiner(Subscribers.none(), parentHeader);
+=======
+    final M miner = executor.createMiner(minedBlockObservers, ethHashObservers, parentHeader);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     return Optional.of(miner.createBlock(parentHeader, transactions, ommers));
   }
 
@@ -80,6 +86,7 @@ public abstract class AbstractMiningCoordinator<
   public void start() {
     synchronized (this) {
       if (state != State.IDLE) {
+<<<<<<< HEAD
         return;
       }
       state = State.RUNNING;
@@ -93,6 +100,21 @@ public abstract class AbstractMiningCoordinator<
       if (state != State.RUNNING) {
         return;
       }
+=======
+        return;
+      }
+      state = State.RUNNING;
+      startMiningIfPossible();
+    }
+  }
+
+  @Override
+  public void stop() {
+    synchronized (this) {
+      if (state != State.RUNNING) {
+        return;
+      }
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       state = State.STOPPED;
       haltCurrentMiningOperation();
       executor.shutDown();
@@ -146,7 +168,12 @@ public abstract class AbstractMiningCoordinator<
 
   private void startAsyncMiningOperation() {
     final BlockHeader parentHeader = blockchain.getChainHeadHeader();
+<<<<<<< HEAD
     currentRunningMiner = executor.startAsyncMining(minedBlockObservers, parentHeader);
+=======
+    currentRunningMiner =
+        executor.startAsyncMining(minedBlockObservers, ethHashObservers, parentHeader);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   private synchronized boolean haltCurrentMiningOperation() {
@@ -188,6 +215,11 @@ public abstract class AbstractMiningCoordinator<
 
   public void addMinedBlockObserver(final MinedBlockObserver obs) {
     minedBlockObservers.subscribe(obs);
+  }
+
+  @Override
+  public void addEthHashObserver(final EthHashObserver obs) {
+    ethHashObservers.subscribe(obs);
   }
 
   @Override

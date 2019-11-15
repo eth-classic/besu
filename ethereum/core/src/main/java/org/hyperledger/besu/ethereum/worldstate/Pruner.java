@@ -54,13 +54,22 @@ public class Pruner {
   Pruner(
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
+<<<<<<< HEAD
       final PruningConfiguration pruningConfiguration,
+=======
+      final PrunerConfiguration prunerConfiguration,
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
       final Supplier<ExecutorService> executorServiceSupplier) {
     this.pruningStrategy = pruningStrategy;
     this.blockchain = blockchain;
     this.executorServiceSupplier = executorServiceSupplier;
+<<<<<<< HEAD
     this.blocksRetained = pruningConfiguration.getBlocksRetained();
     this.blockConfirmations = pruningConfiguration.getBlockConfirmations();
+=======
+    this.blocksRetained = prunerConfiguration.getBlocksRetained();
+    this.blockConfirmations = prunerConfiguration.getBlockConfirmations();
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     checkArgument(
         blockConfirmations >= 0 && blockConfirmations < blocksRetained,
         "blockConfirmations and blocksRetained must be non-negative. blockConfirmations must be less than blockRetained.");
@@ -69,8 +78,13 @@ public class Pruner {
   public Pruner(
       final MarkSweepPruner pruningStrategy,
       final Blockchain blockchain,
+<<<<<<< HEAD
       final PruningConfiguration pruningConfiguration) {
     this(pruningStrategy, blockchain, pruningConfiguration, getDefaultExecutorSupplier());
+=======
+      final PrunerConfiguration prunerConfiguration) {
+    this(pruningStrategy, blockchain, prunerConfiguration, getDefaultExecutorSupplier());
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   private static Supplier<ExecutorService> getDefaultExecutorSupplier() {
@@ -92,6 +106,7 @@ public class Pruner {
       blockAddedObserverId =
           blockchain.observeBlockAdded((event, blockchain) -> handleNewBlock(event));
     }
+<<<<<<< HEAD
   }
 
   public void stop() {
@@ -103,6 +118,19 @@ public class Pruner {
     }
   }
 
+=======
+  }
+
+  public void stop() {
+    if (state.compareAndSet(State.RUNNING, State.STOPPED)) {
+      LOG.info("Stopping Pruner.");
+      pruningStrategy.cleanup();
+      blockchain.removeObserver(blockAddedObserverId);
+      executorService.shutdownNow();
+    }
+  }
+
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   public void awaitStop() throws InterruptedException {
     if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
       LOG.error("Failed to shutdown Pruner executor service.");
