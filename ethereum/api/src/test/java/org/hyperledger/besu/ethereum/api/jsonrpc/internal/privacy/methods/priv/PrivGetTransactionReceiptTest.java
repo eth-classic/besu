@@ -28,10 +28,13 @@ import org.hyperledger.besu.enclave.EnclaveException;
 import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy.PrivateTransactionReceiptResult;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.chain.TransactionLocation;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -125,8 +128,6 @@ public class PrivGetTransactionReceiptTest {
           0,
           0);
 
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
-
   private final BlockchainQueries blockchainQueries = mock(BlockchainQueries.class);
   private final Blockchain blockchain = mock(Blockchain.class);
   private final Enclave enclave = mock(Enclave.class);
@@ -163,8 +164,12 @@ public class PrivGetTransactionReceiptTest {
   @Test
   public void returnReceiptIfTransactionExists() {
     final PrivGetTransactionReceipt privGetTransactionReceipt =
+<<<<<<< HEAD
         new PrivGetTransactionReceipt(blockchainQueries, enclave, parameters, privacyParameters);
-    final Object[] params = new Object[] {transaction.hash()};
+=======
+        new PrivGetTransactionReceipt(blockchainQueries, enclave, privacyParameters);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+    final Object[] params = new Object[] {transaction.getHash()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getTransactionReceipt", params);
 
     final JsonRpcSuccessResponse response =
@@ -181,9 +186,13 @@ public class PrivGetTransactionReceiptTest {
         .thenThrow(new EnclaveException("EnclavePayloadNotFound"));
 
     final PrivGetTransactionReceipt privGetTransactionReceipt =
+<<<<<<< HEAD
         new PrivGetTransactionReceipt(
             blockchainQueries, failingEnclave, parameters, privacyParameters);
-    final Object[] params = new Object[] {transaction.hash()};
+=======
+        new PrivGetTransactionReceipt(blockchainQueries, failingEnclave, privacyParameters);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+    final Object[] params = new Object[] {transaction.getHash()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getTransactionReceipt", params);
 
     final JsonRpcSuccessResponse response =
@@ -199,8 +208,12 @@ public class PrivGetTransactionReceiptTest {
     when(blockchain.getTransactionLocation(nullable(Hash.class))).thenReturn(Optional.empty());
 
     final PrivGetTransactionReceipt privGetTransactionReceipt =
+<<<<<<< HEAD
         new PrivGetTransactionReceipt(blockchainQueries, enclave, parameters, privacyParameters);
-    final Object[] params = new Object[] {transaction.hash()};
+=======
+        new PrivGetTransactionReceipt(blockchainQueries, enclave, privacyParameters);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+    final Object[] params = new Object[] {transaction.getHash()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getTransactionReceipt", params);
 
     final JsonRpcSuccessResponse response =
@@ -214,9 +227,13 @@ public class PrivGetTransactionReceiptTest {
   @Test
   public void enclaveConnectionIssueThrowsRuntimeException() {
     final PrivGetTransactionReceipt privGetTransactionReceipt =
+<<<<<<< HEAD
         new PrivGetTransactionReceipt(
             blockchainQueries, failingEnclave, parameters, privacyParameters);
-    final Object[] params = new Object[] {transaction.hash()};
+=======
+        new PrivGetTransactionReceipt(blockchainQueries, failingEnclave, privacyParameters);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+    final Object[] params = new Object[] {transaction.getHash()};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getTransactionReceipt", params);
 
     final Throwable t = catchThrowable(() -> privGetTransactionReceipt.response(request));

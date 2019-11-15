@@ -14,16 +14,15 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
-import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.UnsignedIntParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionCompleteResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionResult;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.Hash;
 
 import java.util.Optional;
@@ -31,12 +30,9 @@ import java.util.Optional;
 public class EthGetTransactionByBlockHashAndIndex implements JsonRpcMethod {
 
   private final BlockchainQueries blockchain;
-  private final JsonRpcParameter parameters;
 
-  public EthGetTransactionByBlockHashAndIndex(
-      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+  public EthGetTransactionByBlockHashAndIndex(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
-    this.parameters = parameters;
   }
 
   @Override
@@ -46,9 +42,8 @@ public class EthGetTransactionByBlockHashAndIndex implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
-    final int index =
-        parameters.required(request.getParams(), 1, UnsignedIntParameter.class).getValue();
+    final Hash hash = request.getRequiredParameter(0, Hash.class);
+    final int index = request.getRequiredParameter(1, UnsignedIntParameter.class).getValue();
     final Optional<TransactionWithMetadata> transactionWithMetadata =
         blockchain.transactionByBlockHashAndIndex(hash, index);
     final TransactionResult result =

@@ -14,100 +14,56 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.logs;
 
-import org.hyperledger.besu.ethereum.api.LogWithMetadata;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.LogResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionType;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.BlockAddedObserver;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
-import org.hyperledger.besu.ethereum.core.Log;
 
 import java.util.List;
-import java.util.Optional;
+=======
+import org.hyperledger.besu.ethereum.core.LogWithMetadata;
 
-public class LogsSubscriptionService implements BlockAddedObserver {
+import java.util.function.Consumer;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+
+public class LogsSubscriptionService implements Consumer<LogWithMetadata> {
 
   private final SubscriptionManager subscriptionManager;
-  private final BlockchainQueries blockchainQueries;
 
-  public LogsSubscriptionService(
-      final SubscriptionManager subscriptionManager, final BlockchainQueries blockchainQueries) {
+  public LogsSubscriptionService(final SubscriptionManager subscriptionManager) {
     this.subscriptionManager = subscriptionManager;
-    this.blockchainQueries = blockchainQueries;
   }
 
   @Override
-  public void onBlockAdded(final BlockAddedEvent event, final Blockchain blockchain) {
+<<<<<<< HEAD
+  public void onBlockAdded(final BlockAddedEvent event, final Blockchain __) {
     final List<LogsSubscription> logsSubscriptions =
         subscriptionManager.subscriptionsOfType(SubscriptionType.LOGS, LogsSubscription.class);
 
-    if (logsSubscriptions.isEmpty()) {
-      return;
-    }
-
-    event.getAddedTransactions().stream()
-        .map(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .forEachOrdered(
-            receiptWithMetadata -> {
-              final List<Log> logs = receiptWithMetadata.getReceipt().getLogs();
-              sendLogsToMatchingSubscriptions(logs, logsSubscriptions, receiptWithMetadata, false);
-            });
-
-    event.getRemovedTransactions().stream()
-        .map(tx -> blockchainQueries.transactionReceiptByTransactionHash(tx.hash()))
-        .filter(Optional::isPresent)
-        .map(Optional::get)
-        .forEachOrdered(
-            receiptWithMetadata -> {
-              final List<Log> logs = receiptWithMetadata.getReceipt().getLogs();
-              sendLogsToMatchingSubscriptions(logs, logsSubscriptions, receiptWithMetadata, true);
-            });
+    event
+        .getLogsWithMetadata()
+        .forEach(
+            logWithMetadata ->
+                logsSubscriptions.stream()
+                    .filter(
+                        logsSubscription ->
+                            logsSubscription.getLogsQuery().matches(logWithMetadata))
+                    .forEach(
+                        logsSubscription ->
+                            subscriptionManager.sendMessage(
+                                logsSubscription.getSubscriptionId(),
+                                new LogResult(logWithMetadata))));
+=======
+  public void accept(final LogWithMetadata logWithMetadata) {
+    subscriptionManager.subscriptionsOfType(SubscriptionType.LOGS, LogsSubscription.class).stream()
+        .filter(logsSubscription -> logsSubscription.getLogsQuery().matches(logWithMetadata))
+        .forEach(
+            logsSubscription ->
+                subscriptionManager.sendMessage(
+                    logsSubscription.getSubscriptionId(), new LogResult(logWithMetadata)));
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
-
-  private void sendLogsToMatchingSubscriptions(
-      final List<Log> logs,
-      final List<LogsSubscription> logsSubscriptions,
-      final TransactionReceiptWithMetadata receiptWithMetadata,
-      final boolean removed) {
-    for (int logIndex = 0; logIndex < logs.size(); logIndex++) {
-      for (final LogsSubscription subscription : logsSubscriptions) {
-        if (subscription.getLogsQuery().matches(logs.get(logIndex))) {
-          sendLogToSubscription(receiptWithMetadata, removed, logIndex, subscription);
-        }
-      }
-    }
-  }
-
-  private void sendLogToSubscription(
-      final TransactionReceiptWithMetadata receiptWithMetadata,
-      final boolean removed,
-      final int logIndex,
-      final LogsSubscription subscription) {
-    final LogWithMetadata logWithMetaData = logWithMetadata(logIndex, receiptWithMetadata, removed);
-    subscriptionManager.sendMessage(
-        subscription.getSubscriptionId(), new LogResult(logWithMetaData));
-  }
-
-  // @formatter:off
-  private LogWithMetadata logWithMetadata(
-      final int logIndex,
-      final TransactionReceiptWithMetadata transactionReceiptWithMetadata,
-      final boolean removed) {
-    return new LogWithMetadata(
-        logIndex,
-        transactionReceiptWithMetadata.getBlockNumber(),
-        transactionReceiptWithMetadata.getBlockHash(),
-        transactionReceiptWithMetadata.getTransactionHash(),
-        transactionReceiptWithMetadata.getTransactionIndex(),
-        transactionReceiptWithMetadata.getReceipt().getLogs().get(logIndex).getLogger(),
-        transactionReceiptWithMetadata.getReceipt().getLogs().get(logIndex).getData(),
-        transactionReceiptWithMetadata.getReceipt().getLogs().get(logIndex).getTopics(),
-        removed);
-  }
-  // @formatter:on
 }

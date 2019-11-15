@@ -15,9 +15,20 @@
 package org.hyperledger.besu.plugin.services;
 
 import org.hyperledger.besu.plugin.Unstable;
-import org.hyperledger.besu.plugin.data.BlockHeader;
+<<<<<<< HEAD
+=======
+import org.hyperledger.besu.plugin.data.Address;
+import org.hyperledger.besu.plugin.data.LogWithMetadata;
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.plugin.data.PropagatedBlockContext;
 import org.hyperledger.besu.plugin.data.SyncStatus;
 import org.hyperledger.besu.plugin.data.Transaction;
+import org.hyperledger.besu.plugin.data.UnformattedData;
+
+import java.util.List;
+import java.util.Optional;
+
+import java.util.Optional;
 
 /**
  * This service allows plugins to attach to various events during the normal operation of Besu.
@@ -41,14 +52,14 @@ public interface BesuEvents {
    * Add a listener watching new blocks propagated.
    *
    * @param blockPropagatedListener The listener that will accept a BlockHeader as the event.
-   * @return an object to be used as an identifier when de-registering the event.
+   * @return an id to be used as an identifier when de-registering the event.
    */
   long addBlockPropagatedListener(BlockPropagatedListener blockPropagatedListener);
 
   /**
    * Remove the blockAdded listener from besu notifications.
    *
-   * @param listenerIdentifier The instance that was returned from addBlockAddedListener;
+   * @param listenerIdentifier The id that was returned from addBlockAddedListener;
    */
   void removeBlockPropagatedListener(long listenerIdentifier);
 
@@ -57,14 +68,14 @@ public interface BesuEvents {
    *
    * @param transactionAddedListener The listener that will accept the Transaction object as the
    *     event.
-   * @return an object to be used as an identifier when de-registering the event.
+   * @return an id to be used as an identifier when de-registering the event.
    */
   long addTransactionAddedListener(TransactionAddedListener transactionAddedListener);
 
   /**
    * Remove the blockAdded listener from besu notifications.
    *
-   * @param listenerIdentifier The instance that was returned from addTransactionAddedListener;
+   * @param listenerIdentifier The id that was returned from addTransactionAddedListener;
    */
   void removeTransactionAddedListener(long listenerIdentifier);
 
@@ -73,14 +84,14 @@ public interface BesuEvents {
    *
    * @param transactionDroppedListener The listener that will accept the Transaction object as the
    *     event.
-   * @return an object to be used as an identifier when de-registering the event.
+   * @return an id to be used as an identifier when de-registering the event.
    */
   long addTransactionDroppedListener(TransactionDroppedListener transactionDroppedListener);
 
   /**
    * Remove the transactionDropped listener from besu notifications.
    *
-   * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
+   * @param listenerIdentifier The id that was returned from addTransactionDroppedListener;
    */
   void removeTransactionDroppedListener(long listenerIdentifier);
 
@@ -88,16 +99,36 @@ public interface BesuEvents {
    * Add a listener watching the synchronizer status.
    *
    * @param syncStatusListener The listener that will accept the SyncStatus object as the event.
-   * @return an object to be used as an identifier when de-registering the event.
+   * @return The id to be used as an identifier when de-registering the event.
    */
   long addSyncStatusListener(SyncStatusListener syncStatusListener);
 
   /**
-   * Remove the logs listener from besu notifications.
+   * Remove the sync status listener from besu notifications.
    *
-   * @param listenerIdentifier The instance that was returned from addTransactionDroppedListener;
+   * @param listenerIdentifier The id that was returned from addTransactionDroppedListener;
    */
   void removeSyncStatusListener(long listenerIdentifier);
+
+  /**
+   * Add a listener that consumes every log (both added and removed) that matches the filter
+   * parameters when a new block is added to the blockchain.
+   *
+   * @param addresses The addresses from which the log filter will be created
+   * @param topics The topics from which the log filter will be created
+   * @param logListener The listener that will accept the log.
+   * @return The id of the listener to be referred to used to remove the listener.
+   */
+  long addLogListener(
+      List<Address> addresses, List<List<UnformattedData>> topics, LogListener logListener);
+
+  /**
+   * Remove the log listener with the associated id.
+   *
+   * @param listenerIdentifier The id of the listener that was returned when the listener was
+   *     created.
+   */
+  void removeLogListener(long listenerIdentifier);
 
   /** The listener interface for receiving new block propagated events. */
   interface BlockPropagatedListener {
@@ -109,9 +140,9 @@ public interface BesuEvents {
      * <p>The block may not have been imported to the local chain yet and may fail later
      * validations.
      *
-     * @param blockHeader the new block header.
+     * @param propagatedBlockContext block being propagated.
      */
-    void onBlockPropagated(BlockHeader blockHeader);
+    void onBlockPropagated(PropagatedBlockContext propagatedBlockContext);
   }
 
   /** The listener interface for receiving new transaction added events. */
@@ -144,6 +175,21 @@ public interface BesuEvents {
      *
      * @param syncStatus the sync status
      */
-    void onSyncStatusChanged(SyncStatus syncStatus);
+    void onSyncStatusChanged(Optional<SyncStatus> syncStatus);
+<<<<<<< HEAD
+=======
+  }
+
+  /** The listener interface for receiving log events. */
+  interface LogListener {
+
+    /**
+     * Invoked for each log (both added and removed) when a new block is added to the blockchain.
+     *
+     * @param logWithMetadata the log with associated metadata. see
+     *     https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_getfilterchanges
+     */
+    void onLogEmitted(LogWithMetadata logWithMetadata);
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 }

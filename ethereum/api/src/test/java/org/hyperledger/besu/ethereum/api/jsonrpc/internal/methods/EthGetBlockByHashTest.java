@@ -19,9 +19,12 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResultFactory;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Hash;
 
 import org.junit.Before;
@@ -39,7 +42,6 @@ public class EthGetBlockByHashTest {
 
   @Mock private BlockchainQueries blockchainQueries;
   private final BlockResultFactory blockResult = new BlockResultFactory();
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private EthGetBlockByHash method;
   private final String JSON_RPC_VERSION = "2.0";
   private final String ETH_METHOD = "eth_getBlockByHash";
@@ -47,7 +49,7 @@ public class EthGetBlockByHashTest {
 
   @Before
   public void setUp() {
-    method = new EthGetBlockByHash(blockchainQueries, blockResult, parameters);
+    method = new EthGetBlockByHash(blockchainQueries, blockResult);
   }
 
   @Test

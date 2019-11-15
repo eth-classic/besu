@@ -19,9 +19,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 
@@ -31,12 +34,11 @@ import org.junit.Test;
 
 public class EthGetTransactionCountTest {
 
-  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final BlockchainQueries blockchain = mock(BlockchainQueries.class);
   private final PendingTransactions pendingTransactions = mock(PendingTransactions.class);
 
   private final EthGetTransactionCount ethGetTransactionCount =
-      new EthGetTransactionCount(blockchain, pendingTransactions, parameters);
+      new EthGetTransactionCount(blockchain, pendingTransactions);
   private final String pendingTransactionString = "0x00000000000000000000000000000000000000AA";
   private final Object[] pendingParams = new Object[] {pendingTransactionString, "pending"};
 

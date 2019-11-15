@@ -20,11 +20,14 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonCallParameter;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.transaction.CallParameter;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 
@@ -33,10 +36,8 @@ public class EthCall extends AbstractBlockParameterMethod {
   private final TransactionSimulator transactionSimulator;
 
   public EthCall(
-      final BlockchainQueries blockchainQueries,
-      final TransactionSimulator transactionSimulator,
-      final JsonRpcParameter parameters) {
-    super(blockchainQueries, parameters);
+      final BlockchainQueries blockchainQueries, final TransactionSimulator transactionSimulator) {
+    super(blockchainQueries);
     this.transactionSimulator = transactionSimulator;
   }
 
@@ -47,7 +48,7 @@ public class EthCall extends AbstractBlockParameterMethod {
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return getParameters().required(request.getParams(), 1, BlockParameter.class);
+    return request.getRequiredParameter(1, BlockParameter.class);
   }
 
   @Override
@@ -81,8 +82,7 @@ public class EthCall extends AbstractBlockParameterMethod {
   }
 
   private CallParameter validateAndGetCallParams(final JsonRpcRequest request) {
-    final JsonCallParameter callParams =
-        getParameters().required(request.getParams(), 0, JsonCallParameter.class);
+    final JsonCallParameter callParams = request.getRequiredParameter(0, JsonCallParameter.class);
     if (callParams.getTo() == null) {
       throw new InvalidJsonRpcParameters("Missing \"to\" field in call arguments");
     }

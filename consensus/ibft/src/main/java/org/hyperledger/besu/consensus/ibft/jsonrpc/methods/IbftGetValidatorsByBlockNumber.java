@@ -20,8 +20,11 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.AbstractBlockParameterMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.util.Optional;
@@ -37,16 +40,14 @@ public class IbftGetValidatorsByBlockNumber extends AbstractBlockParameterMethod
   private final BlockInterface blockInterface;
 
   public IbftGetValidatorsByBlockNumber(
-      final BlockchainQueries blockchainQueries,
-      final BlockInterface blockInterface,
-      final JsonRpcParameter parameters) {
-    super(blockchainQueries, parameters);
+      final BlockchainQueries blockchainQueries, final BlockInterface blockInterface) {
+    super(blockchainQueries);
     this.blockInterface = blockInterface;
   }
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return getParameters().required(request.getParams(), 0, BlockParameter.class);
+    return request.getRequiredParameter(0, BlockParameter.class);
   }
 
   @Override

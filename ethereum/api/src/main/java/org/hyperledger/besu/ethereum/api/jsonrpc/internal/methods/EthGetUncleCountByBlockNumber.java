@@ -17,15 +17,17 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.Quantity;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 
 public class EthGetUncleCountByBlockNumber extends AbstractBlockParameterMethod {
 
-  public EthGetUncleCountByBlockNumber(
-      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
-    super(blockchain, parameters);
+  public EthGetUncleCountByBlockNumber(final BlockchainQueries blockchain) {
+    super(blockchain);
   }
 
   @Override
@@ -35,7 +37,7 @@ public class EthGetUncleCountByBlockNumber extends AbstractBlockParameterMethod 
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return getParameters().required(request.getParams(), 0, BlockParameter.class);
+    return request.getRequiredParameter(0, BlockParameter.class);
   }
 
   @Override

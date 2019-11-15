@@ -28,7 +28,6 @@ import org.hyperledger.besu.ethereum.api.graphql.GraphQLHttpService;
 import org.hyperledger.besu.ethereum.api.graphql.GraphQLProvider;
 import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcConfiguration;
 import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcHttpService;
-import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcMethodsFactory;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcApi;
 import org.hyperledger.besu.ethereum.api.jsonrpc.health.HealthService;
 import org.hyperledger.besu.ethereum.api.jsonrpc.health.LivenessCheck;
@@ -37,7 +36,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterIdGenerat
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterRepository;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.jsonrpc.methods.JsonRpcMethodsFactory;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketConfiguration;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketRequestHandler;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.WebSocketService;
@@ -48,8 +47,10 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.logs.Log
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.pending.PendingTransactionDroppedSubscriptionService;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.pending.PendingTransactionSubscriptionService;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.syncing.SyncingSubscriptionService;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
+import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
@@ -79,6 +80,7 @@ import org.hyperledger.besu.ethereum.permissioning.account.AccountPermissioningC
 import org.hyperledger.besu.ethereum.permissioning.node.InsufficientPeersPermissioningProvider;
 import org.hyperledger.besu.ethereum.permissioning.node.NodePermissioningController;
 import org.hyperledger.besu.ethereum.permissioning.node.PeerPermissionsAdapter;
+import org.hyperledger.besu.ethereum.stratum.StratumServer;
 import org.hyperledger.besu.ethereum.transaction.TransactionSimulator;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
@@ -131,6 +133,7 @@ public class RunnerBuilder {
   private ObservableMetricsSystem metricsSystem;
   private Optional<PermissioningConfiguration> permissioningConfiguration = Optional.empty();
   private Collection<EnodeURL> staticNodes = Collections.emptyList();
+  private Optional<String> identityString = Optional.empty();
 
   public RunnerBuilder vertx(final Vertx vertx) {
     this.vertx = vertx;
@@ -247,6 +250,11 @@ public class RunnerBuilder {
     return this;
   }
 
+  public RunnerBuilder identityString(final Optional<String> identityString) {
+    this.identityString = identityString;
+    return this;
+  }
+
   public Runner build() {
 
     Preconditions.checkNotNull(besuController);
@@ -290,7 +298,7 @@ public class RunnerBuilder {
             .setBindPort(p2pListenPort)
             .setMaxPeers(maxPeers)
             .setSupportedProtocols(subProtocols)
-            .setClientId(BesuInfo.version())
+            .setClientId(BesuInfo.nodeName(identityString))
             .setLimitRemoteWireConnectionsEnabled(limitRemoteWireConnectionsEnabled)
             .setFractionRemoteWireConnectionsAllowed(fractionRemoteConnectionsAllowed);
     networkingConfiguration.setRlpx(rlpxConfiguration).setDiscovery(discoveryConfiguration);
@@ -353,6 +361,19 @@ public class RunnerBuilder {
     final FilterManager filterManager = createFilterManager(vertx, context, transactionPool);
 
     final P2PNetwork peerNetwork = networkRunner.getNetwork();
+
+    final MiningParameters miningParameters = besuController.getMiningParameters();
+    Optional<StratumServer> stratumServer = Optional.empty();
+    if (miningParameters.isStratumMiningEnabled()) {
+      stratumServer =
+          Optional.of(
+              new StratumServer(
+                  vertx,
+                  miningParameters.getStratumPort(),
+                  miningParameters.getStratumNetworkInterface(),
+                  miningParameters.getStratumExtranonce()));
+      miningCoordinator.addEthHashObserver(stratumServer.get());
+    }
 
     staticNodes.stream()
         .map(DefaultPeer::fromEnodeURL)
@@ -453,8 +474,7 @@ public class RunnerBuilder {
       final SubscriptionManager subscriptionManager =
           createSubscriptionManager(vertx, transactionPool);
 
-      createLogsSubscriptionService(
-          context.getBlockchain(), context.getWorldStateArchive(), subscriptionManager);
+      createLogsSubscriptionService(context.getBlockchain(), subscriptionManager);
 
       createNewBlockHeadersSubscriptionService(
           context.getBlockchain(), context.getWorldStateArchive(), subscriptionManager);
@@ -479,6 +499,7 @@ public class RunnerBuilder {
         jsonRpcHttpService,
         graphQLHttpService,
         webSocketService,
+        stratumServer,
         metricsService,
         besuController,
         dataDir);
@@ -582,7 +603,7 @@ public class RunnerBuilder {
     final Map<String, JsonRpcMethod> methods =
         new JsonRpcMethodsFactory()
             .methods(
-                BesuInfo.version(),
+                BesuInfo.nodeName(identityString),
                 ethNetworkConfig.getNetworkId(),
                 besuController.getGenesisConfigOptions(),
                 network,
@@ -621,14 +642,11 @@ public class RunnerBuilder {
   }
 
   private void createLogsSubscriptionService(
-      final Blockchain blockchain,
-      final WorldStateArchive worldStateArchive,
-      final SubscriptionManager subscriptionManager) {
+      final Blockchain blockchain, final SubscriptionManager subscriptionManager) {
     final LogsSubscriptionService logsSubscriptionService =
-        new LogsSubscriptionService(
-            subscriptionManager, new BlockchainQueries(blockchain, worldStateArchive));
+        new LogsSubscriptionService(subscriptionManager);
 
-    blockchain.observeBlockAdded(logsSubscriptionService);
+    blockchain.observeLogs(logsSubscriptionService);
   }
 
   private void createSyncingSubscriptionService(

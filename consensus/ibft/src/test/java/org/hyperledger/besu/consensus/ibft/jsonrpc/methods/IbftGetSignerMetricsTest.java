@@ -24,10 +24,13 @@ import static org.mockito.Mockito.when;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.SignerMetricResult;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
@@ -49,7 +52,6 @@ public class IbftGetSignerMetricsTest {
     Address.fromHexString("0x1"), Address.fromHexString("0x2"), Address.fromHexString("0x3"),
   };
 
-  private final JsonRpcParameter jsonRpcParameter = new JsonRpcParameter();
   private final String IBFT_METHOD = "ibft_getSignerMetrics";
   private final String JSON_RPC_VERSION = "2.0";
   private IbftGetSignerMetrics method;
@@ -63,7 +65,7 @@ public class IbftGetSignerMetricsTest {
   public void setup() {
     blockchainQueries = mock(BlockchainQueries.class);
     blockInterface = mock(BlockInterface.class);
-    method = new IbftGetSignerMetrics(blockInterface, blockchainQueries, jsonRpcParameter);
+    method = new IbftGetSignerMetrics(blockInterface, blockchainQueries);
   }
 
   @Test

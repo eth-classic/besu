@@ -15,16 +15,19 @@
 package org.hyperledger.besu.consensus.clique.jsonrpc.methods;
 
 import org.hyperledger.besu.consensus.common.VoteTallyCache;
-import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
+import org.hyperledger.besu.ethereum.api.query.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 
@@ -35,15 +38,11 @@ import java.util.stream.Collectors;
 public class CliqueGetSignersAtHash implements JsonRpcMethod {
   private final BlockchainQueries blockchainQueries;
   private final VoteTallyCache voteTallyCache;
-  private final JsonRpcParameter parameters;
 
   public CliqueGetSignersAtHash(
-      final BlockchainQueries blockchainQueries,
-      final VoteTallyCache voteTallyCache,
-      final JsonRpcParameter parameter) {
+      final BlockchainQueries blockchainQueries, final VoteTallyCache voteTallyCache) {
     this.blockchainQueries = blockchainQueries;
     this.voteTallyCache = voteTallyCache;
-    this.parameters = parameter;
   }
 
   @Override
@@ -62,7 +61,7 @@ public class CliqueGetSignersAtHash implements JsonRpcMethod {
   }
 
   private Optional<BlockHeader> determineBlockHeader(final JsonRpcRequest request) {
-    final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
+    final Hash hash = request.getRequiredParameter(0, Hash.class);
     return blockchainQueries.blockByHash(hash).map(BlockWithMetadata::getHeader);
   }
 }

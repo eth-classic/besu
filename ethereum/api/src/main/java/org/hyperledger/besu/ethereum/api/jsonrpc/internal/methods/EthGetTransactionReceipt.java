@@ -16,26 +16,26 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
+=======
+>>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionReceiptResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionReceiptRootResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionReceiptStatusResult;
+import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.query.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.mainnet.TransactionReceiptType;
 
 public class EthGetTransactionReceipt implements JsonRpcMethod {
 
   private final BlockchainQueries blockchain;
-  private final JsonRpcParameter parameters;
 
-  public EthGetTransactionReceipt(
-      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+  public EthGetTransactionReceipt(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
-    this.parameters = parameters;
   }
 
   @Override
@@ -45,7 +45,7 @@ public class EthGetTransactionReceipt implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
+    final Hash hash = request.getRequiredParameter(0, Hash.class);
     final TransactionReceiptResult result =
         blockchain
             .transactionReceiptByTransactionHash(hash)
