@@ -20,15 +20,12 @@ import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.crypto.SECP256K1.Signature;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionReceiptRootResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionReceiptStatusResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
@@ -119,12 +116,14 @@ public class EthGetTransactionReceiptTest {
           false,
           null);
 
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
+
   @SuppressWarnings("unchecked")
   private final ProtocolSchedule<Void> protocolSchedule = mock(ProtocolSchedule.class);
 
   private final BlockchainQueries blockchain = mock(BlockchainQueries.class);
   private final EthGetTransactionReceipt ethGetTransactionReceipt =
-      new EthGetTransactionReceipt(blockchain);
+      new EthGetTransactionReceipt(blockchain, parameters);
   private final String receiptString =
       "0xcbef69eaf44af151aa66677ae4b8d8c343a09f667c873a3a6f4558fa4051fa5f";
   private final Hash receiptHash =

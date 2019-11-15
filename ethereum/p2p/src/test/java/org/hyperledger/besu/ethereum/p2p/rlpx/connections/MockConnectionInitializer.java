@@ -18,7 +18,6 @@ import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.ConnectCallback;
 import org.hyperledger.besu.util.Subscribers;
 
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -53,10 +52,8 @@ public class MockConnectionInitializer implements ConnectionInitializer {
   }
 
   @Override
-  public CompletableFuture<InetSocketAddress> start() {
-    InetSocketAddress socketAddress =
-        new InetSocketAddress("127.0.0.1", NEXT_PORT.incrementAndGet());
-    return CompletableFuture.completedFuture(socketAddress);
+  public CompletableFuture<Integer> start() {
+    return CompletableFuture.completedFuture(NEXT_PORT.incrementAndGet());
   }
 
   @Override

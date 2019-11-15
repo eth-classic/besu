@@ -100,21 +100,33 @@ public final class UpnpNatManagerTest {
   }
 
   @Test
-  public void requestPortForwardThrowsWhenCalledBeforeStart() throws Exception {
+  public void getDiscoveredOnLocalAddressThrowsWhenCalledBeforeStart() throws Exception {
 
     assertThatThrownBy(
             () -> {
-              upnpManager.requestPortForward(80, UpnpNatManager.Protocol.TCP, "");
+              upnpManager.getDiscoveredOnLocalAddress();
             })
         .isInstanceOf(IllegalStateException.class);
   }
 
   @Test
-  public void requestPortForwardThrowsWhenPortIsZero() {
-    upnpManager.start();
+  public void queryStatusInfoThrowsWhenCalledBeforeStart() throws Exception {
 
-    assertThatThrownBy(() -> upnpManager.requestPortForward(0, UpnpNatManager.Protocol.TCP, ""))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(
+            () -> {
+              upnpManager.queryStatusInfo();
+            })
+        .isInstanceOf(IllegalStateException.class);
+  }
+
+  @Test
+  public void requestPortForwardThrowsWhenCalledBeforeStart() throws Exception {
+
+    assertThatThrownBy(
+            () -> {
+              upnpManager.requestPortForward(0, UpnpNatManager.Protocol.TCP, "");
+            })
+        .isInstanceOf(IllegalStateException.class);
   }
 
   @Test

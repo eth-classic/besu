@@ -32,7 +32,6 @@ import org.hyperledger.besu.consensus.ibft.IbftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.ibft.IbftBlockInterface;
 import org.hyperledger.besu.consensus.ibft.IbftContext;
 import org.hyperledger.besu.consensus.ibft.IbftEventQueue;
-import org.hyperledger.besu.consensus.ibft.IbftExecutors;
 import org.hyperledger.besu.consensus.ibft.IbftExtraData;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
 import org.hyperledger.besu.consensus.ibft.IbftHelpers;
@@ -83,6 +82,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Iterables;
@@ -93,24 +93,17 @@ public class TestContextBuilder {
 
   private static class ControllerAndState {
 
-    private final IbftExecutors ibftExecutors;
     private IbftController controller;
     private IbftFinalState finalState;
     private EventMultiplexer eventMultiplexer;
 
     public ControllerAndState(
-        final IbftExecutors ibftExecutors,
         final IbftController controller,
         final IbftFinalState finalState,
         final EventMultiplexer eventMultiplexer) {
-      this.ibftExecutors = ibftExecutors;
       this.controller = controller;
       this.finalState = finalState;
       this.eventMultiplexer = eventMultiplexer;
-    }
-
-    public IbftExecutors getIbftExecutors() {
-      return ibftExecutors;
     }
 
     public IbftController getController() {
@@ -220,16 +213,9 @@ public class TestContextBuilder {
     return new TestContext(
         remotePeers,
         blockChain,
-        controllerAndState.getIbftExecutors(),
         controllerAndState.getController(),
         controllerAndState.getFinalState(),
         controllerAndState.getEventMultiplexer());
-  }
-
-  public TestContext buildAndStart() {
-    TestContext testContext = build();
-    testContext.start();
-    return testContext;
   }
 
   private static Block createGenesisBlock(final Set<Address> validators) {
@@ -316,9 +302,8 @@ public class TestContextBuilder {
             Util.publicKeyToAddress(nodeKeys.getPublicKey()));
 
     final ProposerSelector proposerSelector =
-        new ProposerSelector(blockChain, blockInterface, true, voteTallyCache);
+        new ProposerSelector(blockChain, blockInterface, true);
 
-    final IbftExecutors ibftExecutors = IbftExecutors.create(new NoOpMetricsSystem());
     final IbftFinalState finalState =
         new IbftFinalState(
             protocolContext.getConsensusState().getVoteTallyCache(),
@@ -326,9 +311,13 @@ public class TestContextBuilder {
             Util.publicKeyToAddress(nodeKeys.getPublicKey()),
             proposerSelector,
             multicaster,
-            new RoundTimer(ibftEventQueue, ROUND_TIMER_SEC * 1000, ibftExecutors),
+            new RoundTimer(
+                ibftEventQueue, ROUND_TIMER_SEC * 1000, Executors.newScheduledThreadPool(1)),
             new BlockTimer(
-                ibftEventQueue, BLOCK_TIMER_SEC * 1000, ibftExecutors, TestClock.fixed()),
+                ibftEventQueue,
+                BLOCK_TIMER_SEC * 1000,
+                Executors.newScheduledThreadPool(1),
+                TestClock.fixed()),
             blockCreatorFactory,
             new MessageFactory(nodeKeys),
             clock);
@@ -366,6 +355,6 @@ public class TestContextBuilder {
     final EventMultiplexer eventMultiplexer = new EventMultiplexer(ibftController);
     //////////////////////////// END IBFT BesuController ////////////////////////////
 
-    return new ControllerAndState(ibftExecutors, ibftController, finalState, eventMultiplexer);
+    return new ControllerAndState(ibftController, finalState, eventMultiplexer);
   }
 }

@@ -17,6 +17,7 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -33,11 +34,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class AdminChangeLogLevelTest {
 
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
+
   private AdminChangeLogLevel adminChangeLogLevel;
 
   @Before
   public void before() {
-    adminChangeLogLevel = new AdminChangeLogLevel();
+    adminChangeLogLevel = new AdminChangeLogLevel(parameters);
     Configurator.setAllLevels("", Level.INFO);
   }
 

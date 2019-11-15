@@ -18,23 +18,23 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.Quantity;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.LogsQuery;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
-import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockDataGenerator;
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.LogWithMetadata;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
@@ -85,7 +85,7 @@ public class FilterManagerLogFilterTest {
     filterManager.installLogFilter(latest(), latest(), logsQuery());
     recordNewBlockEvent();
 
-    verify(blockchainQueries).matchingLogs(eq(100L), eq(100L), eq(logsQuery()));
+    verify(blockchainQueries).matchingLogs(eq(100L), eq(100L), refEq(logsQuery()));
   }
 
   @Test
@@ -95,14 +95,14 @@ public class FilterManagerLogFilterTest {
     filterManager.installLogFilter(blockNum(1L), blockNum(10L), logsQuery());
     recordNewBlockEvent();
 
-    verify(blockchainQueries).matchingLogs(eq(3L), eq(10L), eq(logsQuery()));
+    verify(blockchainQueries).matchingLogs(eq(3L), eq(10L), refEq(logsQuery()));
   }
 
   @Test
   public void shouldReturnLogWhenLogFilterMatches() {
     final LogWithMetadata log = logWithMetadata();
     when(blockchainQueries.headBlockNumber()).thenReturn(100L);
-    when(blockchainQueries.matchingLogs(eq(100L), eq(100L), eq(logsQuery())))
+    when(blockchainQueries.matchingLogs(eq(100L), eq(100L), refEq(logsQuery())))
         .thenReturn(Lists.newArrayList(log));
 
     final String filterId = filterManager.installLogFilter(latest(), latest(), logsQuery());
@@ -145,11 +145,8 @@ public class FilterManagerLogFilterTest {
   }
 
   private void recordNewBlockEvent() {
-    final BlockDataGenerator gen = new BlockDataGenerator();
-    final Block block = gen.block();
     filterManager.recordBlockEvent(
-        BlockAddedEvent.createForHeadAdvancement(
-            block, LogWithMetadata.generate(block, gen.receipts(block), false)),
+        BlockAddedEvent.createForHeadAdvancement(new BlockDataGenerator().block()),
         blockchainQueries.getBlockchain());
   }
 
@@ -162,13 +159,13 @@ public class FilterManagerLogFilterTest {
   public void getLogsForExistingFilterReturnsResults() {
     final LogWithMetadata log = logWithMetadata();
     when(blockchainQueries.headBlockNumber()).thenReturn(100L);
-    when(blockchainQueries.matchingLogs(eq(100L), eq(100L), eq(logsQuery())))
+    when(blockchainQueries.matchingLogs(eq(100L), eq(100L), refEq(logsQuery())))
         .thenReturn(Lists.newArrayList(log));
 
     final String filterId = filterManager.installLogFilter(latest(), latest(), logsQuery());
     final List<LogWithMetadata> retrievedLogs = filterManager.logs(filterId);
 
-    assertThat(retrievedLogs).usingRecursiveComparison().isEqualTo(Lists.newArrayList(log));
+    assertThat(retrievedLogs).isEqualToComparingFieldByFieldRecursively(Lists.newArrayList(log));
   }
 
   @Test

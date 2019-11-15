@@ -17,15 +17,17 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.UnsignedIntParameter;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.BlockResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.UncleBlockResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 
 public class EthGetUncleByBlockNumberAndIndex extends AbstractBlockParameterMethod {
 
-  public EthGetUncleByBlockNumberAndIndex(final BlockchainQueries blockchain) {
-    super(blockchain);
+  public EthGetUncleByBlockNumberAndIndex(
+      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+    super(blockchain, parameters);
   }
 
   @Override
@@ -35,12 +37,13 @@ public class EthGetUncleByBlockNumberAndIndex extends AbstractBlockParameterMeth
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return request.getRequiredParameter(0, BlockParameter.class);
+    return getParameters().required(request.getParams(), 0, BlockParameter.class);
   }
 
   @Override
   protected BlockResult resultByBlockNumber(final JsonRpcRequest request, final long blockNumber) {
-    final int index = request.getRequiredParameter(1, UnsignedIntParameter.class).getValue();
+    final int index =
+        getParameters().required(request.getParams(), 1, UnsignedIntParameter.class).getValue();
     return getBlockchainQueries()
         .getOmmer(blockNumber, index)
         .map(UncleBlockResult::build)

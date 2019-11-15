@@ -67,10 +67,8 @@ public class BlockchainReferenceTestTools {
         "RevertPrecompiledTouch(_storage)?_d(0|3)g0v0_(EIP158|Byzantium|Constantinople|ConstantinopleFix)");
 
     // Consumes a huge amount of memory
-    params.blacklist("static_Call1MB1024Calldepth_d1g0v0_\\w+");
-
-    // Absurd amount of gas, doesn't run in parallel
-    params.blacklist("randomStatetest94_\\w+");
+    params.blacklist(
+        "static_Call1MB1024Calldepth_d1g0v0_(Byzantium|Constantinople|ConstantinopleFix)");
   }
 
   public static Collection<Object[]> generateTestParametersForConfig(final String[] filePath) {

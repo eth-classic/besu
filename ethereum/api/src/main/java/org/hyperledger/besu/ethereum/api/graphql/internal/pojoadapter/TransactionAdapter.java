@@ -14,15 +14,15 @@
  */
 package org.hyperledger.besu.ethereum.api.graphql.internal.pojoadapter;
 
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.TransactionReceiptWithMetadata;
-import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
+import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
+import org.hyperledger.besu.ethereum.api.graphql.internal.TransactionReceiptWithMetadata;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.LogWithMetadata;
-import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
+import org.hyperledger.besu.ethereum.core.WorldState;
 import org.hyperledger.besu.util.bytes.BytesValue;
 import org.hyperledger.besu.util.uint.UInt256;
 
@@ -41,7 +41,7 @@ public class TransactionAdapter extends AdapterBase {
   }
 
   public Optional<Hash> getHash() {
-    return Optional.of(transactionWithMetadata.getTransaction().getHash());
+    return Optional.of(transactionWithMetadata.getTransaction().hash());
   }
 
   public Optional<Long> getNonce() {
@@ -54,7 +54,7 @@ public class TransactionAdapter extends AdapterBase {
   }
 
   public Optional<AccountAdapter> getFrom(final DataFetchingEnvironment environment) {
-    final BlockchainQueries query = getBlockchainQueries(environment);
+    final BlockchainQuery query = getBlockchainQuery(environment);
     final Optional<Long> txBlockNumber = transactionWithMetadata.getBlockNumber();
     final Optional<Long> bn = Optional.ofNullable(environment.getArgument("block"));
     if (!txBlockNumber.isPresent() && !bn.isPresent()) {
@@ -69,7 +69,7 @@ public class TransactionAdapter extends AdapterBase {
   }
 
   public Optional<AccountAdapter> getTo(final DataFetchingEnvironment environment) {
-    final BlockchainQueries query = getBlockchainQueries(environment);
+    final BlockchainQuery query = getBlockchainQuery(environment);
     final Optional<Long> txBlockNumber = transactionWithMetadata.getBlockNumber();
     final Optional<Long> bn = Optional.ofNullable(environment.getArgument("block"));
     if (!txBlockNumber.isPresent() && !bn.isPresent()) {
@@ -105,14 +105,14 @@ public class TransactionAdapter extends AdapterBase {
   public Optional<NormalBlockAdapter> getBlock(final DataFetchingEnvironment environment) {
     return transactionWithMetadata
         .getBlockHash()
-        .flatMap(blockHash -> getBlockchainQueries(environment).blockByHash(blockHash))
+        .flatMap(blockHash -> getBlockchainQuery(environment).blockByHash(blockHash))
         .map(NormalBlockAdapter::new);
   }
 
   public Optional<Long> getStatus(final DataFetchingEnvironment environment) {
     return Optional.ofNullable(transactionWithMetadata.getTransaction())
-        .map(Transaction::getHash)
-        .flatMap(rpt -> getBlockchainQueries(environment).transactionReceiptByTransactionHash(rpt))
+        .map(Transaction::hash)
+        .flatMap(rpt -> getBlockchainQuery(environment).transactionReceiptByTransactionHash(rpt))
         .map(TransactionReceiptWithMetadata::getReceipt)
         .flatMap(
             receipt ->
@@ -122,18 +122,16 @@ public class TransactionAdapter extends AdapterBase {
   }
 
   public Optional<Long> getGasUsed(final DataFetchingEnvironment environment) {
-    final BlockchainQueries query = getBlockchainQueries(environment);
+    final BlockchainQuery query = getBlockchainQuery(environment);
     final Optional<TransactionReceiptWithMetadata> rpt =
-        query.transactionReceiptByTransactionHash(
-            transactionWithMetadata.getTransaction().getHash());
+        query.transactionReceiptByTransactionHash(transactionWithMetadata.getTransaction().hash());
     return rpt.map(TransactionReceiptWithMetadata::getGasUsed);
   }
 
   public Optional<Long> getCumulativeGasUsed(final DataFetchingEnvironment environment) {
-    final BlockchainQueries query = getBlockchainQueries(environment);
+    final BlockchainQuery query = getBlockchainQuery(environment);
     final Optional<TransactionReceiptWithMetadata> rpt =
-        query.transactionReceiptByTransactionHash(
-            transactionWithMetadata.getTransaction().getHash());
+        query.transactionReceiptByTransactionHash(transactionWithMetadata.getTransaction().hash());
     if (rpt.isPresent()) {
       final TransactionReceipt receipt = rpt.get().getReceipt();
       return Optional.of(receipt.getCumulativeGasUsed());
@@ -147,7 +145,7 @@ public class TransactionAdapter extends AdapterBase {
       final Optional<Address> addr = transactionWithMetadata.getTransaction().getTo();
 
       if (addr.isPresent()) {
-        final BlockchainQueries query = getBlockchainQueries(environment);
+        final BlockchainQuery query = getBlockchainQuery(environment);
         final Optional<Long> txBlockNumber = transactionWithMetadata.getBlockNumber();
         final Optional<Long> bn = Optional.ofNullable(environment.getArgument("block"));
         if (!txBlockNumber.isPresent() && !bn.isPresent()) {
@@ -155,7 +153,7 @@ public class TransactionAdapter extends AdapterBase {
         }
         final long blockNumber = bn.orElseGet(txBlockNumber::get);
 
-        final Optional<MutableWorldState> ws = query.getWorldState(blockNumber);
+        final Optional<WorldState> ws = query.getWorldState(blockNumber);
         if (ws.isPresent()) {
           return Optional.of(new AccountAdapter(ws.get().get(addr.get())));
         }
@@ -165,15 +163,15 @@ public class TransactionAdapter extends AdapterBase {
   }
 
   public List<LogAdapter> getLogs(final DataFetchingEnvironment environment) {
-    final BlockchainQueries query = getBlockchainQueries(environment);
-    final Hash hash = transactionWithMetadata.getTransaction().getHash();
-    final Optional<TransactionReceiptWithMetadata> maybeTransactionReceiptWithMetadata =
+    final BlockchainQuery query = getBlockchainQuery(environment);
+    final Hash hash = transactionWithMetadata.getTransaction().hash();
+    final Optional<TransactionReceiptWithMetadata> tranRpt =
         query.transactionReceiptByTransactionHash(hash);
     final List<LogAdapter> results = new ArrayList<>();
-    if (maybeTransactionReceiptWithMetadata.isPresent()) {
+    if (tranRpt.isPresent()) {
       final List<LogWithMetadata> logs =
-          LogWithMetadata.generate(
-              maybeTransactionReceiptWithMetadata.get().getReceipt(),
+          BlockchainQuery.generateLogWithMetadataForTransaction(
+              tranRpt.get().getReceipt(),
               transactionWithMetadata.getBlockNumber().get(),
               transactionWithMetadata.getBlockHash().get(),
               hash,

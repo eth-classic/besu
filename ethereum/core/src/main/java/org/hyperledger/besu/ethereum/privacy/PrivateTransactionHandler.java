@@ -94,7 +94,8 @@ public class PrivateTransactionHandler {
     }
   }
 
-  public String getPrivacyGroup(final String key, final PrivateTransaction privateTransaction) {
+  public String getPrivacyGroup(final String key, final PrivateTransaction privateTransaction)
+      throws Exception {
     if (privateTransaction.getPrivacyGroupId().isPresent()) {
       return BytesValues.asBase64String(privateTransaction.getPrivacyGroupId().get());
     }
@@ -107,7 +108,7 @@ public class PrivateTransactionHandler {
     try {
       receiveResponse = enclave.receive(receiveRequest);
       return receiveResponse.getPrivacyGroupId();
-    } catch (final RuntimeException e) {
+    } catch (Exception e) {
       LOG.error("Failed to retrieve private transaction in enclave", e);
       throw e;
     }

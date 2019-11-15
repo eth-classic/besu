@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -36,6 +37,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 public class AdminAddPeerTest {
 
   @Mock private P2PNetwork p2pNetwork;
+  private final JsonRpcParameter parameter = new JsonRpcParameter();
 
   private AdminAddPeer method;
 
@@ -52,7 +54,7 @@ public class AdminAddPeerTest {
 
   @Before
   public void setup() {
-    method = new AdminAddPeer(p2pNetwork);
+    method = new AdminAddPeer(p2pNetwork, parameter);
   }
 
   @Test

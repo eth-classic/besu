@@ -14,20 +14,22 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.UnsignedIntParameter;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.TransactionCompleteResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
 
 import java.util.Optional;
 
 public class EthGetTransactionByBlockNumberAndIndex extends AbstractBlockParameterMethod {
 
-  public EthGetTransactionByBlockNumberAndIndex(final BlockchainQueries blockchain) {
-    super(blockchain);
+  public EthGetTransactionByBlockNumberAndIndex(
+      final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+    super(blockchain, parameters);
   }
 
   @Override
@@ -37,12 +39,13 @@ public class EthGetTransactionByBlockNumberAndIndex extends AbstractBlockParamet
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return request.getRequiredParameter(0, BlockParameter.class);
+    return getParameters().required(request.getParams(), 0, BlockParameter.class);
   }
 
   @Override
   protected Object resultByBlockNumber(final JsonRpcRequest request, final long blockNumber) {
-    final int index = request.getRequiredParameter(1, UnsignedIntParameter.class).getValue();
+    final int index =
+        getParameters().required(request.getParams(), 1, UnsignedIntParameter.class).getValue();
     final Optional<TransactionWithMetadata> transactionWithMetadata =
         getBlockchainQueries().transactionByBlockNumberAndIndex(blockNumber, index);
     return transactionWithMetadata.map(TransactionCompleteResult::new).orElse(null);

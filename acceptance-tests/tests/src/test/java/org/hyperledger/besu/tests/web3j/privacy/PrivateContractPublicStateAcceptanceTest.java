@@ -33,34 +33,32 @@ public class PrivateContractPublicStateAcceptanceTest extends PrivacyAcceptanceT
   private static final long POW_CHAIN_ID = 2018;
 
   private PrivacyNode minerNode;
-  private PrivacyNode transactionNode;
 
   @Before
   public void setUp() throws Exception {
     minerNode =
         privacyBesu.createPrivateTransactionEnabledMinerNode(
             "miner-node", privacyAccountResolver.resolve(0));
-    transactionNode =
-        privacyBesu.createPrivateTransactionEnabledNode(
-            "transaction-node", privacyAccountResolver.resolve(1));
-    privacyCluster.start(minerNode, transactionNode);
+    privacyCluster.start(minerNode);
   }
 
   @Test
   public void mustAllowAccessToPublicStateFromPrivateTx() throws Exception {
     final EventEmitter publicEventEmitter =
-        transactionNode.execute((contractTransactions.createSmartContract(EventEmitter.class)));
+        minerNode.getBesu().execute((contractTransactions.createSmartContract(EventEmitter.class)));
 
     final TransactionReceipt receipt = publicEventEmitter.store(BigInteger.valueOf(12)).send();
     assertThat(receipt).isNotNull();
 
     final CrossContractReader reader =
-        transactionNode.execute(
-            privateContractTransactions.createSmartContract(
-                CrossContractReader.class,
-                transactionNode.getTransactionSigningKey(),
-                POW_CHAIN_ID,
-                transactionNode.getEnclaveKey()));
+        minerNode
+            .getBesu()
+            .execute(
+                privateContractTransactions.createSmartContract(
+                    CrossContractReader.class,
+                    minerNode.getTransactionSigningKey(),
+                    POW_CHAIN_ID,
+                    minerNode.getEnclaveKey()));
 
     assertThat(reader.read(publicEventEmitter.getContractAddress()).send())
         .isEqualTo(BigInteger.valueOf(12));
@@ -69,19 +67,22 @@ public class PrivateContractPublicStateAcceptanceTest extends PrivacyAcceptanceT
   @Test(expected = ContractCallException.class)
   public void mustNotAllowAccessToPrivateStateFromPublicTx() throws Exception {
     final EventEmitter privateEventEmitter =
-        transactionNode.execute(
-            (privateContractTransactions.createSmartContract(
-                EventEmitter.class,
-                transactionNode.getTransactionSigningKey(),
-                POW_CHAIN_ID,
-                transactionNode.getEnclaveKey())));
+        minerNode
+            .getBesu()
+            .execute(
+                (privateContractTransactions.createSmartContract(
+                    EventEmitter.class,
+                    minerNode.getTransactionSigningKey(),
+                    POW_CHAIN_ID,
+                    minerNode.getEnclaveKey())));
 
     final TransactionReceipt receipt = privateEventEmitter.store(BigInteger.valueOf(12)).send();
     assertThat(receipt).isNotNull();
 
     final CrossContractReader publicReader =
-        transactionNode.execute(
-            contractTransactions.createSmartContract(CrossContractReader.class));
+        minerNode
+            .getBesu()
+            .execute(contractTransactions.createSmartContract(CrossContractReader.class));
 
     publicReader.read(privateEventEmitter.getContractAddress()).send();
   }
@@ -89,16 +90,19 @@ public class PrivateContractPublicStateAcceptanceTest extends PrivacyAcceptanceT
   @Test
   public void privateContractMustNotBeAbleToCallPublicContractWhichChangesState() throws Exception {
     final CrossContractReader privateReader =
-        transactionNode.execute(
-            privateContractTransactions.createSmartContract(
-                CrossContractReader.class,
-                transactionNode.getTransactionSigningKey(),
-                POW_CHAIN_ID,
-                transactionNode.getEnclaveKey()));
+        minerNode
+            .getBesu()
+            .execute(
+                privateContractTransactions.createSmartContract(
+                    CrossContractReader.class,
+                    minerNode.getTransactionSigningKey(),
+                    POW_CHAIN_ID,
+                    minerNode.getEnclaveKey()));
 
     final CrossContractReader publicReader =
-        transactionNode.execute(
-            contractTransactions.createSmartContract(CrossContractReader.class));
+        minerNode
+            .getBesu()
+            .execute(contractTransactions.createSmartContract(CrossContractReader.class));
 
     final PrivateTransactionReceipt transactionReceipt =
         (PrivateTransactionReceipt)
@@ -111,16 +115,19 @@ public class PrivateContractPublicStateAcceptanceTest extends PrivacyAcceptanceT
   public void privateContractMustNotBeAbleToCallPublicContractWhichInstantiatesContract()
       throws Exception {
     final CrossContractReader privateReader =
-        transactionNode.execute(
-            privateContractTransactions.createSmartContract(
-                CrossContractReader.class,
-                transactionNode.getTransactionSigningKey(),
-                POW_CHAIN_ID,
-                transactionNode.getEnclaveKey()));
+        minerNode
+            .getBesu()
+            .execute(
+                privateContractTransactions.createSmartContract(
+                    CrossContractReader.class,
+                    minerNode.getTransactionSigningKey(),
+                    POW_CHAIN_ID,
+                    minerNode.getEnclaveKey()));
 
     final CrossContractReader publicReader =
-        transactionNode.execute(
-            contractTransactions.createSmartContract(CrossContractReader.class));
+        minerNode
+            .getBesu()
+            .execute(contractTransactions.createSmartContract(CrossContractReader.class));
 
     final PrivateTransactionReceipt transactionReceipt =
         (PrivateTransactionReceipt)
@@ -130,17 +137,19 @@ public class PrivateContractPublicStateAcceptanceTest extends PrivacyAcceptanceT
   }
 
   @Test
-  public void privateContractMustNotBeAbleToCallSelfDestructOnPublicContract() throws Exception {
+  public void privateContractMustNotBeAbleToCallSelfDetructOfPublicContract() throws Exception {
     final CrossContractReader privateReader =
-        transactionNode.execute(
-            privateContractTransactions.createSmartContract(
-                CrossContractReader.class,
-                transactionNode.getTransactionSigningKey(),
-                POW_CHAIN_ID,
-                transactionNode.getEnclaveKey()));
+        minerNode
+            .getBesu()
+            .execute(
+                privateContractTransactions.createSmartContract(
+                    CrossContractReader.class,
+                    minerNode.getTransactionSigningKey(),
+                    POW_CHAIN_ID,
+                    minerNode.getEnclaveKey()));
 
     final CrossContractReader publicReader =
-        transactionNode
+        minerNode
             .getBesu()
             .execute(contractTransactions.createSmartContract(CrossContractReader.class));
 

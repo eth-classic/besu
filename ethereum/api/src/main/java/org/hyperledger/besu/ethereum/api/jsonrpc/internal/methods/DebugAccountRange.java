@@ -14,17 +14,14 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameterOrBlockHash;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.DebugAccountRangeAtResult;
-import org.hyperledger.besu.ethereum.api.query.BlockWithMetadata;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
@@ -42,13 +39,17 @@ import com.google.common.base.Suppliers;
 
 public class DebugAccountRange implements JsonRpcMethod {
 
+  private final JsonRpcParameter parameters;
   private final Supplier<BlockchainQueries> blockchainQueries;
 
-  public DebugAccountRange(final BlockchainQueries blockchainQueries) {
-    this(Suppliers.ofInstance(blockchainQueries));
+  public DebugAccountRange(
+      final JsonRpcParameter parameters, final BlockchainQueries blockchainQueries) {
+    this(parameters, Suppliers.ofInstance(blockchainQueries));
   }
 
-  public DebugAccountRange(final Supplier<BlockchainQueries> blockchainQueries) {
+  public DebugAccountRange(
+      final JsonRpcParameter parameters, final Supplier<BlockchainQueries> blockchainQueries) {
+    this.parameters = parameters;
     this.blockchainQueries = blockchainQueries;
   }
 
@@ -61,10 +62,11 @@ public class DebugAccountRange implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
+    final Object[] params = request.getParams();
     final BlockParameterOrBlockHash blockParameterOrBlockHash =
-        request.getRequiredParameter(0, BlockParameterOrBlockHash.class);
-    final String addressHash = request.getRequiredParameter(2, String.class);
-    final int maxResults = request.getRequiredParameter(3, Integer.TYPE);
+        parameters.required(params, 0, BlockParameterOrBlockHash.class);
+    final String addressHash = parameters.required(params, 2, String.class);
+    final int maxResults = parameters.required(params, 3, Integer.TYPE);
 
     final Optional<Hash> blockHashOptional = hashFromParameter(blockParameterOrBlockHash);
     if (blockHashOptional.isEmpty()) {

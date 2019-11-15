@@ -27,7 +27,6 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
@@ -68,20 +67,22 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
       final List<Block> blocks,
       final HeaderValidationMode headerValidationMode,
       final MetricsSystem metricsSystem) {
-    checkArgument(!blocks.isEmpty(), "No blocks to import provided");
+    checkArgument(blocks.size() > 0);
     return () -> {
       final List<Block> successfulImports = new ArrayList<>();
-      final Iterator<Block> blockIterator = blocks.iterator();
-      CompletableFuture<Block> future =
-          importBlockAndAddToList(
-              protocolSchedule,
-              protocolContext,
-              blockIterator.next(),
-              successfulImports,
-              headerValidationMode,
-              metricsSystem);
-      while (blockIterator.hasNext()) {
-        final Block block = blockIterator.next();
+      CompletableFuture<Block> future = null;
+      for (final Block block : blocks) {
+        if (future == null) {
+          future =
+              importBlockAndAddToList(
+                  protocolSchedule,
+                  protocolContext,
+                  block,
+                  successfulImports,
+                  headerValidationMode,
+                  metricsSystem);
+          continue;
+        }
         future =
             future.thenCompose(
                 b ->
@@ -121,34 +122,34 @@ public class PersistBlockTask<C> extends AbstractEthTask<Block> {
       final List<Block> blocks,
       final HeaderValidationMode headerValidationMode,
       final MetricsSystem metricsSystem) {
-    checkArgument(!blocks.isEmpty(), "No blocks to import provided");
+    checkArgument(blocks.size() > 0);
     return () -> {
       final CompletableFuture<List<Block>> finalResult = new CompletableFuture<>();
       final List<Block> successfulImports = new ArrayList<>();
-      final Iterator<PersistBlockTask<C>> tasks =
-          blocks.stream()
-              .map(
-                  block ->
-                      PersistBlockTask.create(
-                          protocolSchedule,
-                          protocolContext,
-                          block,
-                          headerValidationMode,
-                          metricsSystem))
-              .iterator();
-
-      CompletableFuture<Block> future = tasks.next().run();
-      while (tasks.hasNext()) {
-        final PersistBlockTask<C> task = tasks.next();
+      CompletableFuture<Block> future = null;
+      for (final Block block : blocks) {
+        if (future == null) {
+          future =
+              PersistBlockTask.create(
+                      protocolSchedule, protocolContext, block, headerValidationMode, metricsSystem)
+                  .run();
+          continue;
+        }
         future =
             future
                 .handle((r, t) -> r)
                 .thenCompose(
-                    r -> {
+                    (r) -> {
                       if (r != null) {
                         successfulImports.add(r);
                       }
-                      return task.run();
+                      return PersistBlockTask.create(
+                              protocolSchedule,
+                              protocolContext,
+                              block,
+                              headerValidationMode,
+                              metricsSystem)
+                          .run();
                     });
       }
       future.whenComplete(

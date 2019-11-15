@@ -14,27 +14,26 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
+import org.hyperledger.besu.ethereum.api.LogsQuery;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.FilterParameter;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.LogsResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.LogsQuery;
 
 public class EthGetLogs implements JsonRpcMethod {
 
   private final BlockchainQueries blockchain;
+  private final JsonRpcParameter parameters;
 
-  public EthGetLogs(final BlockchainQueries blockchain) {
+  public EthGetLogs(final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
     this.blockchain = blockchain;
+    this.parameters = parameters;
   }
 
   @Override
@@ -44,9 +43,13 @@ public class EthGetLogs implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final FilterParameter filter = request.getRequiredParameter(0, FilterParameter.class);
+    final FilterParameter filter =
+        parameters.required(request.getParams(), 0, FilterParameter.class);
     final LogsQuery query =
-        new LogsQuery.Builder().addresses(filter.getAddresses()).topics(filter.getTopics()).build();
+        new LogsQuery.Builder()
+            .addresses(filter.getAddresses())
+            .topics(filter.getTopics().getTopics())
+            .build();
 
     if (isValid(filter)) {
       return new JsonRpcErrorResponse(request.getId(), JsonRpcError.INVALID_PARAMS);

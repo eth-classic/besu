@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransactionHandler;
@@ -30,6 +31,7 @@ import org.junit.Test;
 
 public class PrivGetTransactionCountTest {
 
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final String privacyGroupId =
       BytesValues.asBase64String(BytesValue.wrap("0x123".getBytes(UTF_8)));
 
@@ -44,7 +46,7 @@ public class PrivGetTransactionCountTest {
     when(privateTransactionHandler.getSenderNonce(senderAddress, privacyGroupId)).thenReturn(NONCE);
 
     final PrivGetTransactionCount privGetTransactionCount =
-        new PrivGetTransactionCount(privateTransactionHandler);
+        new PrivGetTransactionCount(parameters, privateTransactionHandler);
 
     final Object[] params = new Object[] {senderAddress, privacyGroupId};
     final JsonRpcRequest request = new JsonRpcRequest("1", "priv_getTransactionCount", params);

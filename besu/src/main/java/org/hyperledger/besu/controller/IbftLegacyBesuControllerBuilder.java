@@ -27,7 +27,6 @@ import org.hyperledger.besu.consensus.ibftlegacy.protocol.Istanbul64Protocol;
 import org.hyperledger.besu.consensus.ibftlegacy.protocol.Istanbul64ProtocolManager;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
-import org.hyperledger.besu.ethereum.blockcreation.NoopMiningCoordinator;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
@@ -64,7 +63,7 @@ public class IbftLegacyBesuControllerBuilder extends BesuControllerBuilder<IbftC
       final MiningParameters miningParameters,
       final SyncState syncState,
       final EthProtocolManager ethProtocolManager) {
-    return new NoopMiningCoordinator(miningParameters);
+    return null;
   }
 
   @Override
@@ -90,11 +89,6 @@ public class IbftLegacyBesuControllerBuilder extends BesuControllerBuilder<IbftC
 
     final VoteProposer voteProposer = new VoteProposer();
     return new IbftContext(voteTallyCache, voteProposer, blockInterface);
-  }
-
-  @Override
-  protected PluginServiceFactory createAdditionalPluginServices(final Blockchain blockchain) {
-    return new NoopPluginServiceFactory();
   }
 
   @Override

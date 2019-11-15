@@ -60,7 +60,7 @@ public class DefaultMutablePrivateWorldStateUpdater implements WorldUpdater {
       publicAccount.setImmutable(true);
       return publicAccount;
     }
-    return privateAccount;
+    return null;
   }
 
   @Override

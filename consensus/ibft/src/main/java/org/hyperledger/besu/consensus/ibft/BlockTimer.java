@@ -19,12 +19,13 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 
 import java.time.Clock;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 /** Class for starting and keeping organised block timers */
 public class BlockTimer {
-  private final IbftExecutors ibftExecutors;
+  private final ScheduledExecutorService timerExecutor;
   private Optional<ScheduledFuture<?>> currentTimerTask;
   private final IbftEventQueue queue;
   private final long minimumTimeBetweenBlocksMillis;
@@ -35,16 +36,16 @@ public class BlockTimer {
    *
    * @param queue The queue in which to put block expiry events
    * @param minimumTimeBetweenBlocksSeconds Minimum timestamp difference between blocks
-   * @param ibftExecutors Executor services that timers can be scheduled with
+   * @param timerExecutor Executor service that timers can be scheduled with
    * @param clock System clock
    */
   public BlockTimer(
       final IbftEventQueue queue,
       final long minimumTimeBetweenBlocksSeconds,
-      final IbftExecutors ibftExecutors,
+      final ScheduledExecutorService timerExecutor,
       final Clock clock) {
     this.queue = queue;
-    this.ibftExecutors = ibftExecutors;
+    this.timerExecutor = timerExecutor;
     this.currentTimerTask = Optional.empty();
     this.minimumTimeBetweenBlocksMillis = minimumTimeBetweenBlocksSeconds * 1000;
     this.clock = clock;
@@ -86,7 +87,7 @@ public class BlockTimer {
       final Runnable newTimerRunnable = () -> queue.add(new BlockTimerExpiry(round));
 
       final ScheduledFuture<?> newTimerTask =
-          ibftExecutors.scheduleTask(newTimerRunnable, delay, TimeUnit.MILLISECONDS);
+          timerExecutor.schedule(newTimerRunnable, delay, TimeUnit.MILLISECONDS);
       currentTimerTask = Optional.of(newTimerTask);
     } else {
       queue.add(new BlockTimerExpiry(round));

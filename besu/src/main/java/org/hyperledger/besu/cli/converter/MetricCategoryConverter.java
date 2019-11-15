@@ -20,7 +20,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.common.annotations.VisibleForTesting;
 import picocli.CommandLine;
 
 public class MetricCategoryConverter implements CommandLine.ITypeConverter<MetricCategory> {
@@ -42,11 +41,6 @@ public class MetricCategoryConverter implements CommandLine.ITypeConverter<Metri
   }
 
   public void addRegistryCategory(final MetricCategory metricCategory) {
-    metricCategories.put(metricCategory.getName().toUpperCase(), metricCategory);
-  }
-
-  @VisibleForTesting
-  Map<String, MetricCategory> getMetricCategories() {
-    return metricCategories;
+    metricCategories.put(metricCategory.getName(), metricCategory);
   }
 }

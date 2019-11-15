@@ -19,6 +19,7 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.JsonRpcErrorConverter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.privacy.methods.AbstractSendTransaction;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -32,8 +33,9 @@ public class EeaSendRawTransaction extends AbstractSendTransaction implements Js
 
   public EeaSendRawTransaction(
       final PrivateTransactionHandler privateTransactionHandler,
-      final TransactionPool transactionPool) {
-    super(privateTransactionHandler, transactionPool);
+      final TransactionPool transactionPool,
+      final JsonRpcParameter parameters) {
+    super(privateTransactionHandler, transactionPool, parameters);
   }
 
   @Override
@@ -81,7 +83,7 @@ public class EeaSendRawTransaction extends AbstractSendTransaction implements Js
               .either(
                   () ->
                       new JsonRpcSuccessResponse(
-                          request.getId(), privacyMarkerTransaction.getHash().toString()),
+                          request.getId(), privacyMarkerTransaction.hash().toString()),
                   errorReason ->
                       new JsonRpcErrorResponse(
                           request.getId(),

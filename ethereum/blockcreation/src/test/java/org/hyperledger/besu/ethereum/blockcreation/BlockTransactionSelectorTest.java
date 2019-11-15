@@ -471,9 +471,9 @@ public class BlockTransactionSelectorTest {
 
     selector.buildTransactionListForBlock();
 
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(validTransaction.getHash()))
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(validTransaction.hash()))
         .isPresent();
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(invalidTransaction.getHash()))
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(invalidTransaction.hash()))
         .isNotPresent();
   }
 
@@ -517,7 +517,7 @@ public class BlockTransactionSelectorTest {
     final BlockTransactionSelector.TransactionSelectionResults results =
         selector.buildTransactionListForBlock();
 
-    Assertions.assertThat(pendingTransactions.getTransactionByHash(futureTransaction.getHash()))
+    Assertions.assertThat(pendingTransactions.getTransactionByHash(futureTransaction.hash()))
         .isPresent();
     assertThat(results.getTransactions().size()).isEqualTo(0);
   }

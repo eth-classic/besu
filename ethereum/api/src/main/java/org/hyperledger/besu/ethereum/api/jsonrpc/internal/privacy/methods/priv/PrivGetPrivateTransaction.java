@@ -19,19 +19,16 @@ import static org.apache.logging.log4j.LogManager.getLogger;
 import org.hyperledger.besu.enclave.Enclave;
 import org.hyperledger.besu.enclave.types.ReceiveRequest;
 import org.hyperledger.besu.enclave.types.ReceiveResponse;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy.PrivateTransactionGroupResult;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.privacy.PrivateTransactionLegacyResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.privacy.PrivateTransaction;
@@ -46,14 +43,17 @@ public class PrivGetPrivateTransaction implements JsonRpcMethod {
 
   private final BlockchainQueries blockchain;
   private final Enclave enclave;
+  private final JsonRpcParameter parameters;
   private final PrivacyParameters privacyParameters;
 
   public PrivGetPrivateTransaction(
       final BlockchainQueries blockchain,
       final Enclave enclave,
+      final JsonRpcParameter parameters,
       final PrivacyParameters privacyParameters) {
     this.blockchain = blockchain;
     this.enclave = enclave;
+    this.parameters = parameters;
     this.privacyParameters = privacyParameters;
   }
 
@@ -66,7 +66,7 @@ public class PrivGetPrivateTransaction implements JsonRpcMethod {
   public JsonRpcResponse response(final JsonRpcRequest request) {
     LOG.trace("Executing {}", RpcMethod.PRIV_GET_PRIVATE_TRANSACTION.getMethodName());
 
-    final Hash hash = request.getRequiredParameter(0, Hash.class);
+    final Hash hash = parameters.required(request.getParams(), 0, Hash.class);
     final TransactionWithMetadata resultTransaction =
         blockchain.transactionByHash(hash).orElse(null);
 

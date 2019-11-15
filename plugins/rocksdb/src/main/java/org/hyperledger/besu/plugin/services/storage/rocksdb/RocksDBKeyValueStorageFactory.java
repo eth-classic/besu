@@ -47,7 +47,6 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   private final int DEFAULT_VERSION;
   private static final Set<Integer> SUPPORTED_VERSIONS = Set.of(0, 1);
   private static final String NAME = "rocksdb";
-  private final RocksDBMetricsFactory rocksDBMetricsFactory;
 
   private Integer databaseVersion;
   private Boolean isSegmentIsolationSupported;
@@ -61,24 +60,20 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
   RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
       final List<SegmentIdentifier> segments,
-      final int DEFAULT_VERSION,
-      final RocksDBMetricsFactory rocksDBMetricsFactory) {
+      final int DEFAULT_VERSION) {
     this.configuration = configuration;
     this.segments = segments;
     this.DEFAULT_VERSION = DEFAULT_VERSION;
-    this.rocksDBMetricsFactory = rocksDBMetricsFactory;
   }
 
   public RocksDBKeyValueStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
-      final List<SegmentIdentifier> segments,
-      final RocksDBMetricsFactory rocksDBMetricsFactory) {
+      final List<SegmentIdentifier> segments) {
     this(
         configuration,
         segments,
         /** Source of truth for the default database version. */
-        1,
-        rocksDBMetricsFactory);
+        1);
   }
 
   @Override
@@ -105,9 +100,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
         {
           segmentedStorage = null;
           if (unsegmentedStorage == null) {
-            unsegmentedStorage =
-                new RocksDBKeyValueStorage(
-                    rocksDBConfiguration, metricsSystem, rocksDBMetricsFactory);
+            unsegmentedStorage = new RocksDBKeyValueStorage(rocksDBConfiguration, metricsSystem);
           }
           return unsegmentedStorage;
         }
@@ -116,8 +109,7 @@ public class RocksDBKeyValueStorageFactory implements KeyValueStorageFactory {
           unsegmentedStorage = null;
           if (segmentedStorage == null) {
             segmentedStorage =
-                new RocksDBColumnarKeyValueStorage(
-                    rocksDBConfiguration, segments, metricsSystem, rocksDBMetricsFactory);
+                new RocksDBColumnarKeyValueStorage(rocksDBConfiguration, segments, metricsSystem);
           }
           return new SegmentedKeyValueStorageAdapter<>(segment, segmentedStorage);
         }

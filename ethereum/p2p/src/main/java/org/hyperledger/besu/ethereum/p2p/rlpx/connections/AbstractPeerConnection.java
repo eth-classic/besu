@@ -200,8 +200,8 @@ public abstract class AbstractPeerConnection implements PeerConnection {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
-        .add("nodeId", peerInfo.getNodeId())
         .add("clientId", peerInfo.getClientId())
+        .add("nodeId", peerInfo.getNodeId())
         .add(
             "caps",
             agreedCapabilities.stream().map(Capability::toString).collect(Collectors.joining(", ")))

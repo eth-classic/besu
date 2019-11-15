@@ -18,7 +18,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.consensus.common.ValidatorProvider;
-import org.hyperledger.besu.consensus.common.VoteTallyCache;
 import org.hyperledger.besu.consensus.ibft.ConsensusRoundIdentifier;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Address;
@@ -56,19 +55,15 @@ public class ProposerSelector {
    */
   private final Boolean changeEachBlock;
 
-  private final VoteTallyCache voteTallyCache;
-
   private final BlockInterface blockInterface;
 
   public ProposerSelector(
       final Blockchain blockchain,
       final BlockInterface blockInterface,
-      final boolean changeEachBlock,
-      final VoteTallyCache voteTallyCache) {
+      final boolean changeEachBlock) {
     this.blockchain = blockchain;
     this.blockInterface = blockInterface;
     this.changeEachBlock = changeEachBlock;
-    this.voteTallyCache = voteTallyCache;
   }
 
   /**
@@ -90,8 +85,7 @@ public class ProposerSelector {
 
     final BlockHeader blockHeader = maybeParentHeader.get();
     final Address prevBlockProposer = blockInterface.getProposerOfBlock(blockHeader);
-    final Collection<Address> validatorsForRound =
-        voteTallyCache.getVoteTallyAfterBlock(blockHeader).getValidators();
+    final Collection<Address> validatorsForRound = blockInterface.validatorsInBlock(blockHeader);
 
     if (!validatorsForRound.contains(prevBlockProposer)) {
       return handleMissingProposer(prevBlockProposer, validatorsForRound, roundIdentifier);

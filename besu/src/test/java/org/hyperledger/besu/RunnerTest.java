@@ -52,7 +52,6 @@ import org.hyperledger.besu.metrics.ObservableMetricsSystem;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValueStorageFactory;
-import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBMetricsFactory;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.testutil.TestClock;
@@ -370,8 +369,7 @@ public final class RunnerTest {
                         MAX_BACKGROUND_COMPACTIONS,
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
-                Arrays.asList(KeyValueSegmentIdentifier.values()),
-                RocksDBMetricsFactory.PUBLIC_ROCKS_DB_METRICS))
+                Arrays.asList(KeyValueSegmentIdentifier.values())))
         .withCommonConfiguration(new BesuConfigurationImpl(dataDir, dbDir))
         .withMetricsSystem(new NoOpMetricsSystem())
         .build();

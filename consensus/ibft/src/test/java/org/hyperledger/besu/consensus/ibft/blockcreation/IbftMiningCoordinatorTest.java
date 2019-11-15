@@ -15,15 +15,12 @@
 package org.hyperledger.besu.consensus.ibft.blockcreation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.consensus.ibft.IbftEventQueue;
-import org.hyperledger.besu.consensus.ibft.IbftExecutors;
 import org.hyperledger.besu.consensus.ibft.IbftProcessor;
 import org.hyperledger.besu.consensus.ibft.ibftevent.NewChainHead;
-import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.ethereum.chain.BlockAddedEvent;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -32,7 +29,6 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Wei;
 import org.hyperledger.besu.util.bytes.BytesValue;
 
-import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
 import org.assertj.core.util.Lists;
@@ -44,8 +40,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IbftMiningCoordinatorTest {
-  @Mock private IbftController controller;
-  @Mock private IbftExecutors ibftExecutors;
   @Mock private IbftProcessor ibftProcessor;
   @Mock private IbftBlockCreatorFactory ibftBlockCreatorFactory;
   @Mock private Blockchain blockChain;
@@ -58,31 +52,20 @@ public class IbftMiningCoordinatorTest {
   @Before
   public void setup() {
     ibftMiningCoordinator =
-        new IbftMiningCoordinator(
-            ibftExecutors,
-            controller,
-            ibftProcessor,
-            ibftBlockCreatorFactory,
-            blockChain,
-            eventQueue);
+        new IbftMiningCoordinator(ibftProcessor, ibftBlockCreatorFactory, blockChain, eventQueue);
     when(block.getBody()).thenReturn(blockBody);
     when(block.getHeader()).thenReturn(blockHeader);
     when(blockBody.getTransactions()).thenReturn(Lists.emptyList());
   }
 
   @Test
-  public void startsMining() {
-    ibftMiningCoordinator.start();
+  public void enablesMining() {
+    ibftMiningCoordinator.enable();
   }
 
   @Test
-  public void stopsMining() {
-    // Shouldn't stop without first starting
-    ibftMiningCoordinator.stop();
-    verify(ibftProcessor, never()).stop();
-
-    ibftMiningCoordinator.start();
-    ibftMiningCoordinator.stop();
+  public void disablesMining() {
+    ibftMiningCoordinator.disable();
     verify(ibftProcessor).stop();
   }
 
@@ -102,8 +85,7 @@ public class IbftMiningCoordinatorTest {
 
   @Test
   public void addsNewChainHeadEventWhenNewCanonicalHeadBlockEventReceived() throws Exception {
-    BlockAddedEvent headAdvancement =
-        BlockAddedEvent.createForHeadAdvancement(block, Collections.emptyList());
+    BlockAddedEvent headAdvancement = BlockAddedEvent.createForHeadAdvancement(block);
     ibftMiningCoordinator.onBlockAdded(headAdvancement, blockChain);
 
     assertThat(eventQueue.size()).isEqualTo(1);

@@ -39,13 +39,12 @@ public class MinerStart implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest req) {
-    final boolean enabled;
     try {
-      enabled = miningCoordinator.enable();
+      miningCoordinator.enable();
     } catch (final CoinbaseNotSetException e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.COINBASE_NOT_SET);
     }
 
-    return new JsonRpcSuccessResponse(req.getId(), enabled);
+    return new JsonRpcSuccessResponse(req.getId(), true);
   }
 }

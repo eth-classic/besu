@@ -21,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockTrace;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockTracer;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.TransactionTrace;
@@ -41,9 +42,10 @@ import org.junit.Test;
 
 public class DebugTraceBlockByHashTest {
 
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final BlockTracer blockTracer = mock(BlockTracer.class);
   private final DebugTraceBlockByHash debugTraceBlockByHash =
-      new DebugTraceBlockByHash(blockTracer);
+      new DebugTraceBlockByHash(parameters, blockTracer);
 
   private final Hash blockHash =
       Hash.fromHexString("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");

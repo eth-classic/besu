@@ -17,7 +17,6 @@ package org.hyperledger.besu.metrics.rocksdb;
 import static org.hyperledger.besu.metrics.BesuMetricCategory.KVSTORE_ROCKSDB_STATS;
 
 import org.hyperledger.besu.metrics.prometheus.PrometheusMetricsSystem;
-import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -170,20 +169,19 @@ public class RocksDBStats {
   };
 
   public static void registerRocksDBMetrics(
-      final Statistics stats,
-      final PrometheusMetricsSystem metricsSystem,
-      final MetricCategory category) {
+      final Statistics stats, final PrometheusMetricsSystem metricsSystem) {
+
     for (final TickerType ticker : TICKERS) {
       final String promCounterName = ticker.name().toLowerCase();
       metricsSystem.createLongGauge(
-          category,
+          KVSTORE_ROCKSDB_STATS,
           promCounterName,
           "RocksDB reported statistics for " + ticker.name(),
           () -> stats.getTickerCount(ticker));
     }
 
     for (final HistogramType histogram : HISTOGRAMS) {
-      metricsSystem.addCollector(category, histogramToCollector(stats, histogram));
+      metricsSystem.addCollector(KVSTORE_ROCKSDB_STATS, histogramToCollector(stats, histogram));
     }
   }
 

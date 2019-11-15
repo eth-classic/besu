@@ -14,24 +14,27 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
+import org.hyperledger.besu.ethereum.api.LogWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.filter.FilterManager;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.LogsResult;
-import org.hyperledger.besu.ethereum.core.LogWithMetadata;
 
 import java.util.List;
 
 public class EthGetFilterLogs implements JsonRpcMethod {
 
   private final FilterManager filterManager;
+  private final JsonRpcParameter parameters;
 
-  public EthGetFilterLogs(final FilterManager filterManager) {
+  public EthGetFilterLogs(final FilterManager filterManager, final JsonRpcParameter parameters) {
     this.filterManager = filterManager;
+    this.parameters = parameters;
   }
 
   @Override
@@ -41,7 +44,7 @@ public class EthGetFilterLogs implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final String filterId = request.getRequiredParameter(0, String.class);
+    final String filterId = parameters.required(request.getParams(), 0, String.class);
 
     final List<LogWithMetadata> logs = filterManager.logs(filterId);
     if (logs != null) {

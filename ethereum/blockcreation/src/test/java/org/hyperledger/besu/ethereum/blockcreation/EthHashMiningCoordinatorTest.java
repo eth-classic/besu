@@ -48,7 +48,7 @@ public class EthHashMiningCoordinatorTest {
         new EthHashMiningCoordinator(executionContext.getBlockchain(), executor, syncState);
     final EthHashSolution solution = new EthHashSolution(1L, Hash.EMPTY, new byte[Bytes32.SIZE]);
 
-    assertThat(miningCoordinator.isMining()).isFalse();
+    assertThat(miningCoordinator.isRunning()).isFalse();
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(Optional.empty());
     assertThat(miningCoordinator.getWorkDefinition()).isEqualTo(Optional.empty());
     assertThat(miningCoordinator.submitWork(solution)).isFalse();
@@ -63,19 +63,12 @@ public class EthHashMiningCoordinatorTest {
 
     when(miner.getHashesPerSecond()).thenReturn(hashRate1, hashRate2, hashRate3);
 
-<<<<<<< HEAD
-    when(executor.startAsyncMining(any(), any())).thenReturn(Optional.of(miner));
-=======
-    when(executor.startAsyncMining(any(), any(), any())).thenReturn(Optional.of(miner));
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+    when(executor.startAsyncMining(any(), any())).thenReturn(miner);
 
     final EthHashMiningCoordinator miningCoordinator =
         new EthHashMiningCoordinator(executionContext.getBlockchain(), executor, syncState);
 
-    // Must enable prior returning data
-    miningCoordinator.enable();
-    miningCoordinator.start();
-
+    miningCoordinator.enable(); // Must enable prior returning data
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(hashRate1);
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(hashRate1);
     assertThat(miningCoordinator.hashesPerSecond()).isEqualTo(hashRate3);

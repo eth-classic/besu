@@ -25,7 +25,6 @@ import org.hyperledger.besu.ethereum.core.MessageFrameTestFixture;
 import org.hyperledger.besu.ethereum.vm.MessageFrame;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
-import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBMetricsFactory;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBConfigurationBuilder;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 import org.hyperledger.besu.util.uint.UInt256;
@@ -57,8 +56,7 @@ public class OperationBenchmarkHelper {
     final KeyValueStorage keyValueStorage =
         new RocksDBKeyValueStorage(
             new RocksDBConfigurationBuilder().databaseDir(storageDirectory).build(),
-            new NoOpMetricsSystem(),
-            RocksDBMetricsFactory.PUBLIC_ROCKS_DB_METRICS);
+            new NoOpMetricsSystem());
 
     final ExecutionContextTestFixture executionContext =
         ExecutionContextTestFixture.builder().keyValueStorage(keyValueStorage).build();

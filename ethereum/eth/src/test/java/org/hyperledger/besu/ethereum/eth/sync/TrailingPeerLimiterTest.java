@@ -35,7 +35,6 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage.Di
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -117,8 +116,7 @@ public class TrailingPeerLimiterTest {
         BlockAddedEvent.createForHeadAdvancement(
             new Block(
                 new BlockHeaderTestFixture().number(500).buildHeader(),
-                new BlockBody(emptyList(), emptyList())),
-            Collections.emptyList());
+                new BlockBody(emptyList(), emptyList())));
     trailingPeerLimiter.onBlockAdded(blockAddedEvent, blockchain);
 
     assertDisconnections(ethPeer1);
@@ -134,8 +132,7 @@ public class TrailingPeerLimiterTest {
         BlockAddedEvent.createForHeadAdvancement(
             new Block(
                 new BlockHeaderTestFixture().number(599).buildHeader(),
-                new BlockBody(emptyList(), emptyList())),
-            Collections.emptyList());
+                new BlockBody(emptyList(), emptyList())));
     trailingPeerLimiter.onBlockAdded(blockAddedEvent, blockchain);
 
     assertDisconnections();

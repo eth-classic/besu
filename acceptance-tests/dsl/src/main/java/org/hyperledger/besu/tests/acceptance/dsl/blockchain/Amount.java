@@ -17,9 +17,6 @@ package org.hyperledger.besu.tests.acceptance.dsl.blockchain;
 import static org.web3j.utils.Convert.Unit.ETHER;
 import static org.web3j.utils.Convert.Unit.WEI;
 
-import org.hyperledger.besu.ethereum.core.Wei;
-
-import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import org.web3j.utils.Convert;
@@ -27,27 +24,20 @@ import org.web3j.utils.Convert.Unit;
 
 public class Amount {
 
-  private BigDecimal value;
+  private String value;
   private Unit unit;
 
-  private Amount(final BigDecimal value, final Unit unit) {
-    this.value = value;
+  private Amount(final long value, final Unit unit) {
+    this.value = String.valueOf(value);
     this.unit = unit;
   }
 
-  public static Amount ether(final long value) {
-    return new Amount(BigDecimal.valueOf(value), ETHER);
+  private Amount(final BigInteger value, final Unit unit) {
+    this.value = value.toString();
+    this.unit = unit;
   }
 
-  public static Amount wei(final BigInteger value) {
-    return new Amount(new BigDecimal(value), WEI);
-  }
-
-  public static Amount wei(final Wei wei) {
-    return wei(new BigInteger(wei.toUnprefixedHexString(), 16));
-  }
-
-  public BigDecimal getValue() {
+  public String getValue() {
     return value;
   }
 
@@ -64,11 +54,21 @@ public class Amount {
       denominator = subtracting.unit;
     }
 
-    final BigDecimal result =
+    final BigInteger result =
         Convert.fromWei(
-            Convert.toWei(value, unit).subtract(Convert.toWei(subtracting.value, subtracting.unit)),
-            denominator);
+                Convert.toWei(value, unit)
+                    .subtract(Convert.toWei(subtracting.value, subtracting.unit)),
+                denominator)
+            .toBigInteger();
 
     return new Amount(result, denominator);
+  }
+
+  public static Amount ether(final long value) {
+    return new Amount(value, ETHER);
+  }
+
+  public static Amount wei(final BigInteger value) {
+    return new Amount(value, WEI);
   }
 }

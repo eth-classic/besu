@@ -2,21 +2,17 @@
   "config": {
     "chainId": 61,
     "homesteadBlock": 1150000,
-<<<<<<< HEAD
-    "ecip1015Block": 2500000,
-    "eip150Hash": "0xca12c63534f565899681965528d536c52cb05b7c48e269c2a6cb77ad864d878a",
-    "diehardBlock": 3000000,
-    "ecip1041Block": 5900000,
+    "daoForkBlock": 1920000,
+    "daoForkSupport": true,
+    "eip150Block": 2463000,
+    "eip150Hash": "0x2086799aeebeae135c246c65021c82b4e15a2c451340993aacfd2751886514f0",
+    "eip155Block": 2675000,
+    "eip158Block": 2675000,
+    "byzantiumBlock": 4370000,
+    "constantinopleBlock": 7280000,
+    "constantinopleFixBlock": 7280000,
     "atlantisBlock": 8772000,
     "aghartaBlock": 9200000,
-=======
-    "classicForkBlock": 1920000,
-    "ecip1015Block": 2500000,
-    "diehardBlock": 3000000,
-    "gothamBlock": 5000001,
-    "ecip1041Block": 5900000,
-    "atlantisBlock": 8772000,
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
     "ethash": {
 
     }

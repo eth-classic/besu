@@ -79,7 +79,7 @@ public class PublicKeySubCommandTest extends CommandTestAbstract {
 
   // public-key sub-command
   @Test
-  public void publicKeySubCommandExistsAndHasSubCommands() {
+  public void publicKeySubCommandExistAnbHaveSubCommands() {
     CommandSpec spec = parseCommand().getSpec();
     assertThat(spec.subcommands()).containsKeys(PUBLIC_KEY_SUBCOMMAND_NAME);
     assertThat(spec.subcommands().get(PUBLIC_KEY_SUBCOMMAND_NAME).getSubcommands())

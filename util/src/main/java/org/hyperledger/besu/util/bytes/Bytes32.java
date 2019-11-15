@@ -16,7 +16,6 @@ package org.hyperledger.besu.util.bytes;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import org.hyperledger.besu.plugin.data.UnformattedData;
 import org.hyperledger.besu.util.uint.Int256;
 import org.hyperledger.besu.util.uint.UInt256;
 import org.hyperledger.besu.util.uint.UInt256Bytes;
@@ -167,10 +166,6 @@ public interface Bytes32 extends BytesValue {
    */
   static Bytes32 fromHexStringStrict(final String str) {
     return wrap(BytesValues.fromRawHexString(str, -1, false));
-  }
-
-  static Bytes32 fromPlugin(final UnformattedData data) {
-    return data instanceof Bytes32 ? (Bytes32) data : wrap(data.getByteArray());
   }
 
   @Override

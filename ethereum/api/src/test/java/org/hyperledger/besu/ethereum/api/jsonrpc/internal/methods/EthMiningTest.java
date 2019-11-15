@@ -49,26 +49,26 @@ public class EthMiningTest {
   }
 
   @Test
-  public void shouldReturnTrueWhenMining() {
+  public void shouldReturnTrueWhenMiningCoordinatorExistsAndRunning() {
     final JsonRpcRequest request = requestWithParams();
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), true);
-    when(miningCoordinator.isMining()).thenReturn(true);
+    when(miningCoordinator.isRunning()).thenReturn(true);
 
     final JsonRpcResponse actualResponse = method.response(request);
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    verify(miningCoordinator).isMining();
+    verify(miningCoordinator).isRunning();
     verifyNoMoreInteractions(miningCoordinator);
   }
 
   @Test
-  public void shouldReturnFalseWhenNotMining() {
+  public void shouldReturnFalseWhenMiningCoordinatorExistsAndDisabled() {
     final JsonRpcRequest request = requestWithParams();
     final JsonRpcResponse expectedResponse = new JsonRpcSuccessResponse(request.getId(), false);
-    when(miningCoordinator.isMining()).thenReturn(false);
+    when(miningCoordinator.isRunning()).thenReturn(false);
 
     final JsonRpcResponse actualResponse = method.response(request);
     assertThat(actualResponse).isEqualToComparingFieldByField(expectedResponse);
-    verify(miningCoordinator).isMining();
+    verify(miningCoordinator).isRunning();
     verifyNoMoreInteractions(miningCoordinator);
   }
 

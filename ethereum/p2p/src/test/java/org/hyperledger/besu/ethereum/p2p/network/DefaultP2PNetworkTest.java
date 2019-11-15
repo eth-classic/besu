@@ -90,9 +90,7 @@ public final class DefaultP2PNetworkTest {
     lenient().when(rlpxAgent.stop()).thenReturn(CompletableFuture.completedFuture(null));
     lenient()
         .when(discoveryAgent.start(anyInt()))
-        .thenAnswer(
-            invocation ->
-                CompletableFuture.completedFuture(invocation.getArgument(0, Integer.class)));
+        .thenReturn(CompletableFuture.completedFuture(30303));
     lenient().when(discoveryAgent.stop()).thenReturn(CompletableFuture.completedFuture(null));
     lenient()
         .when(discoveryAgent.observePeerBondedEvents(discoverySubscriberCaptor.capture()))

@@ -14,20 +14,19 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters;
 
-import static java.util.Collections.singletonList;
-
-import org.hyperledger.besu.ethereum.core.LogTopic;
+import org.hyperledger.besu.ethereum.api.TopicsParameter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.google.common.collect.Lists;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 
-public class TopicsDeserializer extends StdDeserializer<List<List<LogTopic>>> {
+public class TopicsDeserializer extends StdDeserializer<TopicsParameter> {
   public TopicsDeserializer() {
     this(null);
   }
@@ -37,27 +36,23 @@ public class TopicsDeserializer extends StdDeserializer<List<List<LogTopic>>> {
   }
 
   @Override
-  public List<List<LogTopic>> deserialize(
+  public TopicsParameter deserialize(
       final JsonParser jsonparser, final DeserializationContext context) throws IOException {
-    final JsonNode topicsNode = jsonparser.getCodec().readTree(jsonparser);
-    final List<List<LogTopic>> topics = Lists.newArrayList();
+    List<String> topicsList = new ArrayList<>();
 
-    if (!topicsNode.isArray()) {
-      topics.add(singletonList(LogTopic.fromHexString(topicsNode.textValue())));
-    } else {
-      for (JsonNode child : topicsNode) {
-        if (child.isArray()) {
-          final List<LogTopic> childItems = Lists.newArrayList();
-          for (JsonNode subChild : child) {
-            childItems.add(LogTopic.fromHexString(subChild.textValue()));
-          }
-          topics.add(childItems);
-        } else {
-          topics.add(singletonList(LogTopic.fromHexString(child.textValue())));
-        }
+    try {
+      // parse as list of lists
+      return jsonparser.readValueAs(TopicsParameter.class);
+    } catch (MismatchedInputException mie) {
+      // single list case
+      String topics = jsonparser.getText();
+      jsonparser.nextToken(); // consume end of array character
+      if (topics == null) {
+        return new TopicsParameter(Collections.singletonList(topicsList));
+      } else {
+        // make it list of list
+        return new TopicsParameter(Collections.singletonList(Collections.singletonList(topics)));
       }
     }
-
-    return topics;
   }
 }

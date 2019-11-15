@@ -21,13 +21,14 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.hyperledger.besu.ethereum.api.BlockWithMetadata;
+import org.hyperledger.besu.ethereum.api.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockReplay;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.DebugStorageRangeAtResult;
-import org.hyperledger.besu.ethereum.api.query.BlockWithMetadata;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
-import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.Account;
 import org.hyperledger.besu.ethereum.core.AccountStorageEntry;
@@ -56,11 +57,12 @@ public class DebugStorageRangeAtTest {
 
   private static final int TRANSACTION_INDEX = 2;
   private static final Bytes32 START_KEY_HASH = Bytes32.fromHexString("0x22");
+  private final JsonRpcParameter parameters = new JsonRpcParameter();
   private final Blockchain blockchain = mock(Blockchain.class);
   private final BlockchainQueries blockchainQueries = mock(BlockchainQueries.class);
   private final BlockReplay blockReplay = mock(BlockReplay.class);
   private final DebugStorageRangeAt debugStorageRangeAt =
-      new DebugStorageRangeAt(blockchainQueries, blockReplay);
+      new DebugStorageRangeAt(parameters, blockchainQueries, blockReplay);
   private final MutableWorldState worldState = mock(MutableWorldState.class);
   private final Account account = mock(Account.class);
   private final TransactionProcessor transactionProcessor = mock(TransactionProcessor.class);
@@ -75,7 +77,7 @@ public class DebugStorageRangeAtTest {
 
   @Before
   public void setUp() {
-    when(transaction.getHash()).thenReturn(transactionHash);
+    when(transaction.hash()).thenReturn(transactionHash);
   }
 
   @Test

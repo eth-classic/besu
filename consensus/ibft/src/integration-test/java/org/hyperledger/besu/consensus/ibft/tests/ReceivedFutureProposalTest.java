@@ -48,7 +48,7 @@ public class ReceivedFutureProposalTest {
       new TestContextBuilder()
           .validatorCount(NETWORK_SIZE)
           .indexOfFirstLocallyProposedBlock(0)
-          .buildAndStart();
+          .build();
   private final ConsensusRoundIdentifier roundId = new ConsensusRoundIdentifier(1, 0);
   private final RoundSpecificPeers peers = context.roundSpecificPeers(roundId);
 

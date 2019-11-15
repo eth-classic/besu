@@ -14,7 +14,6 @@
  */
 package org.hyperledger.besu.config;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.isNull;
 
 import java.math.BigInteger;
@@ -25,7 +24,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
 
@@ -35,52 +33,23 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   private static final String IBFT_LEGACY_CONFIG_KEY = "ibft";
   private static final String IBFT2_CONFIG_KEY = "ibft2";
   private static final String CLIQUE_CONFIG_KEY = "clique";
-  private static final String CUSTOM_FORKS_CONFIG_KEY = "customforks";
   private final ObjectNode configRoot;
   private final Map<String, String> configOverrides = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-  private final CustomForksConfigOptions customForks;
 
   public static JsonGenesisConfigOptions fromJsonObject(final ObjectNode configRoot) {
-    return fromJsonObjectWithOverrides(configRoot, emptyMap());
+    return new JsonGenesisConfigOptions(configRoot);
   }
 
-  static JsonGenesisConfigOptions fromJsonObjectWithOverrides(
-      final ObjectNode configRoot, final Map<String, String> configOverrides) {
-    final CustomForksConfigOptions customForksConfigOptions;
-    try {
-      customForksConfigOptions = loadCustomForksFrom(configRoot);
-    } catch (final JsonProcessingException e) {
-      throw new RuntimeException("CustomForks section of genesis file failed to decode.", e);
-    }
-    return new JsonGenesisConfigOptions(configRoot, configOverrides, customForksConfigOptions);
-  }
-
-  private static CustomForksConfigOptions loadCustomForksFrom(final ObjectNode parentNode)
-      throws JsonProcessingException {
-
-    final Optional<ObjectNode> customForksNode =
-        JsonUtil.getObjectNode(parentNode, CUSTOM_FORKS_CONFIG_KEY);
-    if (customForksNode.isEmpty()) {
-      return new CustomForksConfigOptions(JsonUtil.createEmptyObjectNode());
-    }
-
-    return new CustomForksConfigOptions(customForksNode.get());
-  }
-
-  private JsonGenesisConfigOptions(
-      final ObjectNode maybeConfig, final CustomForksConfigOptions customForksConfig) {
-    this(maybeConfig, Collections.emptyMap(), customForksConfig);
+  private JsonGenesisConfigOptions(final ObjectNode maybeConfig) {
+    this(maybeConfig, Collections.emptyMap());
   }
 
   JsonGenesisConfigOptions(
-      final ObjectNode maybeConfig,
-      final Map<String, String> configOverrides,
-      final CustomForksConfigOptions customForksConfig) {
+      final ObjectNode maybeConfig, final Map<String, String> configOverrides) {
     this.configRoot = isNull(maybeConfig) ? JsonUtil.createEmptyObjectNode() : maybeConfig;
     if (configOverrides != null) {
       this.configOverrides.putAll(configOverrides);
     }
-    this.customForks = customForksConfig;
   }
 
   @Override
@@ -147,11 +116,6 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public CustomForksConfigOptions getCustomForks() {
-    return customForks;
-  }
-
-  @Override
   public OptionalLong getHomesteadBlockNumber() {
     return getOptionalLong("homesteadblock");
   }
@@ -196,50 +160,6 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-<<<<<<< HEAD
-=======
-  public OptionalLong getClassicForkBlock() {
-    return getOptionalLong("classicforkblock");
-  }
-
-  @Override
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
-  public OptionalLong getEcip1015BlockNumber() {
-    return getOptionalLong("ecip1015block");
-  }
-
-  @Override
-  public OptionalLong getDieHardBlockNumber() {
-    return getOptionalLong("diehardblock");
-  }
-
-  @Override
-<<<<<<< HEAD
-=======
-  public OptionalLong getGothamBlockNumber() {
-    return getOptionalLong("gothamblock");
-  }
-
-  @Override
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
-  public OptionalLong getDefuseDifficultyBombBlockNumber() {
-    return getOptionalLong("ecip1041block");
-  }
-
-  @Override
-  public OptionalLong getAtlantisBlockNumber() {
-    return getOptionalLong("atlantisblock");
-  }
-
-  @Override
-<<<<<<< HEAD
-  public OptionalLong getAghartaBlockNumber() {
-    return getOptionalLong("aghartablock");
-  }
-
-  @Override
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   public Optional<BigInteger> getChainId() {
     return getOptionalBigInteger("chainid");
   }
@@ -252,6 +172,16 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   @Override
   public OptionalInt getEvmStackSize() {
     return getOptionalInt("evmstacksize");
+  }
+
+  @Override
+  public OptionalLong getAtlantisBlockNumber() {
+    return getOptionalLong("atlantisblock");
+  }
+
+  @Override
+  public OptionalLong getAghartaBlockNumber() {
+    return getOptionalLong("aghartablock");
   }
 
   @Override

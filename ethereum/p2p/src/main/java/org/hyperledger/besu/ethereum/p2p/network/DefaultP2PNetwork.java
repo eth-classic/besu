@@ -189,22 +189,12 @@ public class DefaultP2PNetwork implements P2PNetwork {
       return;
     }
 
-    final int configuredDiscoveryPort = config.getDiscovery().getBindPort();
-    final int configuredRlpxPort = config.getRlpx().getBindPort();
-
-    final int listeningPort = rlpxAgent.start().join();
-    final int discoveryPort =
-        peerDiscoveryAgent
-            .start(
-                (configuredDiscoveryPort == 0 && configuredRlpxPort == 0)
-                    ? listeningPort
-                    : configuredDiscoveryPort)
-            .join();
-
     if (natManager.isPresent()) {
-      this.configureNatEnvironment(listeningPort, discoveryPort);
+      this.configureNatEnvironment();
     }
 
+    final int listeningPort = rlpxAgent.start().join();
+    final int discoveryPort = peerDiscoveryAgent.start(listeningPort).join();
     setLocalNode(listeningPort, discoveryPort);
 
     peerBondedObserverId =
@@ -265,7 +255,6 @@ public class DefaultP2PNetwork implements P2PNetwork {
   public boolean removeMaintainedConnectionPeer(final Peer peer) {
     final boolean wasRemoved = maintainedPeers.remove(peer);
     peerDiscoveryAgent.dropPeer(peer);
-    LOG.debug("Disconnect requested for peer {}.", peer);
     rlpxAgent.disconnect(peer.getId(), DisconnectReason.REQUESTED);
     return wasRemoved;
   }
@@ -372,9 +361,8 @@ public class DefaultP2PNetwork implements P2PNetwork {
     localNode.setEnode(localEnode);
   }
 
-  private void configureNatEnvironment(final int listeningPort, final int discoveryPort) {
-    final CompletableFuture<String> natQueryFuture =
-        this.natManager.orElseThrow().queryExternalIPAddress();
+  private void configureNatEnvironment() {
+    CompletableFuture<String> natQueryFuture = this.natManager.get().queryExternalIPAddress();
     String externalAddress = null;
     try {
       final int timeoutSeconds = 60;
@@ -390,15 +378,19 @@ public class DefaultP2PNetwork implements P2PNetwork {
         LOG.info("External IP detected: " + externalAddress);
         this.natManager
             .get()
-            .requestPortForward(discoveryPort, UpnpNatManager.Protocol.UDP, "besu-discovery");
+            .requestPortForward(
+                this.config.getDiscovery().getBindPort(),
+                UpnpNatManager.Protocol.UDP,
+                "besu-discovery");
         this.natManager
             .get()
-            .requestPortForward(listeningPort, UpnpNatManager.Protocol.TCP, "besu-rlpx");
+            .requestPortForward(
+                this.config.getRlpx().getBindPort(), UpnpNatManager.Protocol.TCP, "besu-rlpx");
       } else {
         LOG.info("No external IP detected within timeout.");
       }
 
-    } catch (final Exception e) {
+    } catch (Exception e) {
       LOG.error("Error configuring NAT environment", e);
     }
     natExternalAddress = Optional.ofNullable(externalAddress);

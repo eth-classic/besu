@@ -15,11 +15,9 @@
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcRequestException;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -32,8 +30,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JsonRpcRequest {
-
-  private final JsonRpcParameter parameterAccessor = new JsonRpcParameter();
 
   private JsonRpcRequestId id;
   private final String method;
@@ -127,13 +123,5 @@ public class JsonRpcRequest {
   @Override
   public int hashCode() {
     return Objects.hash(id, method, Arrays.hashCode(params), version, isNotification);
-  }
-
-  public <T> T getRequiredParameter(final int index, final Class<T> paramClass) {
-    return parameterAccessor.required(params, index, paramClass);
-  }
-
-  public <T> Optional<T> getOptionalParameter(final int index, final Class<T> paramClass) {
-    return parameterAccessor.optional(params, index, paramClass);
   }
 }

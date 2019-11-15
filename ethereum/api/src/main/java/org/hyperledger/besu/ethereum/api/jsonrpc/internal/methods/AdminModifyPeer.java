@@ -16,6 +16,7 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -24,10 +25,12 @@ import org.hyperledger.besu.ethereum.p2p.network.exceptions.P2PDisabledException
 
 public abstract class AdminModifyPeer implements JsonRpcMethod {
 
+  protected final JsonRpcParameter parameters;
   protected final P2PNetwork peerNetwork;
 
-  public AdminModifyPeer(final P2PNetwork peerNetwork) {
+  public AdminModifyPeer(final P2PNetwork peerNetwork, final JsonRpcParameter parameters) {
     this.peerNetwork = peerNetwork;
+    this.parameters = parameters;
   }
 
   @Override
@@ -36,7 +39,7 @@ public abstract class AdminModifyPeer implements JsonRpcMethod {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);
     }
     try {
-      final String enodeString = req.getRequiredParameter(0, String.class);
+      final String enodeString = parameters.required(req.getParams(), 0, String.class);
       return performOperation(req.getId(), enodeString);
     } catch (final InvalidJsonRpcParameters e) {
       return new JsonRpcErrorResponse(req.getId(), JsonRpcError.INVALID_PARAMS);

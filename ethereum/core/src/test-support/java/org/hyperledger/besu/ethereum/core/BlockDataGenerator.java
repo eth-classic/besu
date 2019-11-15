@@ -35,16 +35,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
 import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPublicKey;
@@ -206,14 +203,11 @@ public class BlockDataGenerator {
   }
 
   public Block genesisBlock() {
-    return genesisBlock(new BlockOptions());
-  }
-
-  public Block genesisBlock(final BlockOptions options) {
-    options
-        .setBlockNumber(BlockHeader.GENESIS_BLOCK_NUMBER)
-        .setStateRoot(Hash.EMPTY_TRIE_HASH)
-        .setParentHash(Hash.ZERO);
+    final BlockOptions options =
+        new BlockOptions()
+            .setBlockNumber(BlockHeader.GENESIS_BLOCK_NUMBER)
+            .setStateRoot(Hash.EMPTY_TRIE_HASH)
+            .setParentHash(Hash.ZERO);
     return block(options);
   }
 
@@ -355,10 +349,6 @@ public class BlockDataGenerator {
     return receipt(positiveLong());
   }
 
-  public TransactionReceipt receipt(final List<Log> logs) {
-    return new TransactionReceipt(hash(), positiveLong(), logs, Optional.empty());
-  }
-
   public UInt256 storageKey() {
     return uint256();
   }
@@ -375,22 +365,8 @@ public class BlockDataGenerator {
     return receipts;
   }
 
-  public List<Log> logs(final int logsCount, final int topicsPerLog) {
-    return Stream.generate(() -> log(topicsPerLog)).limit(logsCount).collect(Collectors.toList());
-  }
-
   public Log log() {
-    return log(0);
-  }
-
-  public Log log(final int topicCount) {
-    final List<LogTopic> topics =
-        Stream.generate(this::logTopic).limit(topicCount).collect(Collectors.toList());
-    return new Log(address(), bytesValue(5, 15), topics);
-  }
-
-  private LogTopic logTopic() {
-    return LogTopic.create(bytesValue(LogTopic.SIZE));
+    return new Log(address(), bytesValue(5 + random.nextInt(10)), Collections.emptyList());
   }
 
   private Bytes32 bytes32() {
@@ -398,18 +374,6 @@ public class BlockDataGenerator {
   }
 
   public BytesValue bytesValue(final int size) {
-    return BytesValue.wrap(bytes(size));
-  }
-
-  public BytesValue bytesValue() {
-    return bytesValue(1, 20);
-  }
-
-  public BytesValue bytesValue(final int minSize, final int maxSize) {
-    checkArgument(minSize >= 0);
-    checkArgument(maxSize >= 0);
-    checkArgument(maxSize > minSize);
-    final int size = random.nextInt(maxSize - minSize) + minSize;
     return BytesValue.wrap(bytes(size));
   }
 
@@ -443,6 +407,18 @@ public class BlockDataGenerator {
 
   public LogsBloomFilter logsBloom() {
     return new LogsBloomFilter(BytesValue.of(bytes(LogsBloomFilter.BYTE_SIZE)));
+  }
+
+  public BytesValue bytesValue() {
+    return bytesValue(1, 20);
+  }
+
+  public BytesValue bytesValue(final int minSize, final int maxSize) {
+    checkArgument(minSize >= 0);
+    checkArgument(maxSize >= 0);
+    checkArgument(maxSize > minSize);
+    final int size = random.nextInt(maxSize - minSize) + minSize;
+    return BytesValue.wrap(bytes(size));
   }
 
   private byte[] bytes(final int size) {
@@ -487,7 +463,7 @@ public class BlockDataGenerator {
     private Optional<Hash> parentHash = Optional.empty();
     private Optional<Hash> stateRoot = Optional.empty();
     private Optional<UInt256> difficulty = Optional.empty();
-    private List<Transaction> transactions = new ArrayList<>();
+    private Optional<List<Transaction>> transactions = Optional.empty();
     private Optional<BytesValue> extraData = Optional.empty();
     private Optional<BlockHeaderFunctions> blockHeaderFunctions = Optional.empty();
 
@@ -496,7 +472,7 @@ public class BlockDataGenerator {
     }
 
     public List<Transaction> getTransactions(final List<Transaction> defaultValue) {
-      return transactions.isEmpty() ? defaultValue : transactions;
+      return transactions.orElse(defaultValue);
     }
 
     public long getBlockNumber(final long defaultValue) {
@@ -524,12 +500,11 @@ public class BlockDataGenerator {
     }
 
     public BlockOptions addTransaction(final Transaction... tx) {
-      transactions.addAll(Arrays.asList(tx));
+      if (!transactions.isPresent()) {
+        transactions = Optional.of(new ArrayList<>());
+      }
+      transactions.get().addAll(Arrays.asList(tx));
       return this;
-    }
-
-    public BlockOptions addTransaction(final Collection<Transaction> txs) {
-      return addTransaction(txs.toArray(new Transaction[] {}));
     }
 
     public BlockOptions setBlockNumber(final long blockNumber) {

@@ -17,16 +17,13 @@ package org.hyperledger.besu.consensus.common.jsonrpc;
 import org.hyperledger.besu.consensus.common.BlockInterface;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.SignerMetricResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 
@@ -42,19 +39,23 @@ public abstract class AbstractGetSignerMetricsMethod {
 
   private final BlockInterface blockInterface;
   private final BlockchainQueries blockchainQueries;
+  private final JsonRpcParameter parameters;
 
   public AbstractGetSignerMetricsMethod(
-      final BlockInterface blockInterface, final BlockchainQueries blockchainQueries) {
+      final BlockInterface blockInterface,
+      final BlockchainQueries blockchainQueries,
+      final JsonRpcParameter parameter) {
     this.blockInterface = blockInterface;
     this.blockchainQueries = blockchainQueries;
+    this.parameters = parameter;
   }
 
   public JsonRpcResponse response(final JsonRpcRequest request) {
 
     final Optional<BlockParameter> startBlockParameter =
-        request.getOptionalParameter(0, BlockParameter.class);
+        parameters.optional(request.getParams(), 0, BlockParameter.class);
     final Optional<BlockParameter> endBlockParameter =
-        request.getOptionalParameter(1, BlockParameter.class);
+        parameters.optional(request.getParams(), 1, BlockParameter.class);
 
     final long fromBlockNumber = getFromBlockNumber(startBlockParameter);
     final long toBlockNumber = getEndBlockNumber(endBlockParameter);

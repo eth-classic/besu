@@ -17,6 +17,7 @@ package org.hyperledger.besu.ethereum.retesteth.methods;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.core.Block;
@@ -36,9 +37,11 @@ public class TestImportRawBlock implements JsonRpcMethod {
   private static final String METHOD_NAME = "test_importRawBlock";
 
   private final RetestethContext context;
+  private final JsonRpcParameter parameters;
 
-  public TestImportRawBlock(final RetestethContext context) {
+  public TestImportRawBlock(final RetestethContext context, final JsonRpcParameter parameters) {
     this.context = context;
+    this.parameters = parameters;
   }
 
   @Override
@@ -48,7 +51,7 @@ public class TestImportRawBlock implements JsonRpcMethod {
 
   @Override
   public JsonRpcResponse response(final JsonRpcRequest request) {
-    final String input = request.getRequiredParameter(0, String.class);
+    final String input = parameters.required(request.getParams(), 0, String.class);
     final ProtocolSpec<Void> protocolSpec = context.getProtocolSpec(context.getBlockHeight());
     final ProtocolContext<Void> protocolContext = this.context.getProtocolContext();
 

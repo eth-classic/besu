@@ -14,6 +14,7 @@
  */
 package org.hyperledger.besu.ethereum.eth.manager;
 
+import org.hyperledger.besu.ethereum.chain.ChainHead;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Hash;
 import org.hyperledger.besu.util.Subscribers;
@@ -21,7 +22,7 @@ import org.hyperledger.besu.util.uint.UInt256;
 
 import com.google.common.base.MoreObjects;
 
-public class ChainState implements ChainHeadEstimate {
+public class ChainState {
   // The best block by total difficulty that we know about
   private final BestBlock bestBlock = new BestBlock();
   // The highest block that we've seen
@@ -39,20 +40,14 @@ public class ChainState implements ChainHeadEstimate {
     estimatedHeightListeners.unsubscribe(listenerId);
   }
 
-  public ChainStateSnapshot getSnapshot() {
-    return new ChainStateSnapshot(getEstimatedTotalDifficulty(), getEstimatedHeight());
-  }
-
   public boolean hasEstimatedHeight() {
     return estimatedHeightKnown;
   }
 
-  @Override
   public long getEstimatedHeight() {
     return estimatedHeight;
   }
 
-  @Override
   public UInt256 getEstimatedTotalDifficulty() {
     return bestBlock.getTotalDifficulty();
   }
@@ -103,12 +98,32 @@ public class ChainState implements ChainHeadEstimate {
 
   public void updateHeightEstimate(final long blockNumber) {
     synchronized (this) {
+      estimatedHeightKnown = true;
       if (blockNumber > estimatedHeight) {
-        estimatedHeightKnown = true;
         estimatedHeight = blockNumber;
         estimatedHeightListeners.forEach(e -> e.onEstimatedHeightChanged(estimatedHeight));
       }
     }
+  }
+
+  /**
+   * Returns true if this chain state represents a chain that is "better" than the chain represented
+   * by the supplied {@link ChainHead}. "Better" currently means that this chain is longer or
+   * heavier than the supplied {@code chainToCheck}.
+   *
+   * @param chainToCheck The chain being compared.
+   * @return true if this {@link ChainState} represents a better chain than {@code chainToCheck}.
+   */
+  public boolean chainIsBetterThan(final ChainHead chainToCheck) {
+    return hasHigherDifficultyThan(chainToCheck) || hasLongerChainThan(chainToCheck);
+  }
+
+  private boolean hasHigherDifficultyThan(final ChainHead chainToCheck) {
+    return bestBlock.getTotalDifficulty().compareTo(chainToCheck.getTotalDifficulty()) > 0;
+  }
+
+  private boolean hasLongerChainThan(final ChainHead chainToCheck) {
+    return estimatedHeight > chainToCheck.getHeight();
   }
 
   @Override

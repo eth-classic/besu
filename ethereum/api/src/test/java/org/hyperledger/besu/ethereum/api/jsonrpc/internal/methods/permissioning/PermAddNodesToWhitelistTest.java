@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -59,9 +60,12 @@ public class PermAddNodesToWhitelistTest {
 
   @Mock private NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController;
 
+  private JsonRpcParameter params = new JsonRpcParameter();
+
   @Before
   public void setUp() {
-    method = new PermAddNodesToWhitelist(Optional.of(nodeLocalConfigPermissioningController));
+    method =
+        new PermAddNodesToWhitelist(Optional.of(nodeLocalConfigPermissioningController), params);
   }
 
   @Test
@@ -175,7 +179,7 @@ public class PermAddNodesToWhitelistTest {
 
   @Test
   public void shouldFailWhenP2pDisabled() {
-    method = new PermAddNodesToWhitelist(Optional.empty());
+    method = new PermAddNodesToWhitelist(Optional.empty(), params);
 
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
     ;

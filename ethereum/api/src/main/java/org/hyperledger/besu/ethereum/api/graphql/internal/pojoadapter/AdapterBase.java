@@ -15,12 +15,12 @@
 package org.hyperledger.besu.ethereum.api.graphql.internal.pojoadapter;
 
 import org.hyperledger.besu.ethereum.api.graphql.GraphQLDataFetcherContext;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.graphql.internal.BlockchainQuery;
 
 import graphql.schema.DataFetchingEnvironment;
 
 abstract class AdapterBase {
-  BlockchainQueries getBlockchainQueries(final DataFetchingEnvironment environment) {
-    return ((GraphQLDataFetcherContext) environment.getContext()).getBlockchainQueries();
+  BlockchainQuery getBlockchainQuery(final DataFetchingEnvironment environment) {
+    return ((GraphQLDataFetcherContext) environment.getContext()).getBlockchainQuery();
   }
 }

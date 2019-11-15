@@ -80,7 +80,7 @@ public class BlockReplay {
         (body, header, blockchain, mutableWorldState, transactionProcessor) -> {
           final BlockHashLookup blockHashLookup = new BlockHashLookup(header, blockchain);
           for (final Transaction transaction : body.getTransactions()) {
-            if (transaction.getHash().equals(transactionHash)) {
+            if (transaction.hash().equals(transactionHash)) {
               return Optional.of(
                   action.performAction(
                       transaction, header, blockchain, mutableWorldState, transactionProcessor));

@@ -21,11 +21,7 @@ import java.util.Collection;
 
 /**
  * Provides relevant data for producing metrics on the status of a Proof of Authority (PoA) node.
- *
- * @deprecated This interface has been replaced by {@link
- *     org.hyperledger.besu.plugin.services.query.PoaQueryService}
  */
-@Deprecated
 public interface PoAMetricsService {
 
   /**

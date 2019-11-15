@@ -25,6 +25,7 @@ import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.testutil.TestClock;
 import org.hyperledger.besu.util.Subscribers;
 
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
 import org.junit.Test;
@@ -47,6 +48,7 @@ public class EthHashMinerExecutorTest {
     final EthHashMinerExecutor executor =
         new EthHashMinerExecutor(
             null,
+            Executors.newCachedThreadPool(),
             null,
             pendingTransactions,
             miningParameters,
@@ -54,7 +56,7 @@ public class EthHashMinerExecutorTest {
             Function.identity());
 
     assertThatExceptionOfType(CoinbaseNotSetException.class)
-        .isThrownBy(() -> executor.startAsyncMining(Subscribers.create(), Subscribers.none(), null))
+        .isThrownBy(() -> executor.startAsyncMining(Subscribers.create(), null))
         .withMessageContaining("Unable to start mining without a coinbase.");
   }
 
@@ -72,6 +74,7 @@ public class EthHashMinerExecutorTest {
     final EthHashMinerExecutor executor =
         new EthHashMinerExecutor(
             null,
+            Executors.newCachedThreadPool(),
             null,
             pendingTransactions,
             miningParameters,

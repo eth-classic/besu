@@ -35,7 +35,7 @@ public class PendingTransactionDroppedSubscriptionService
 
   @Override
   public void onTransactionDropped(final Transaction transaction) {
-    notifySubscribers(transaction.getHash());
+    notifySubscribers(transaction.hash());
   }
 
   private void notifySubscribers(final Hash pendingTransaction) {

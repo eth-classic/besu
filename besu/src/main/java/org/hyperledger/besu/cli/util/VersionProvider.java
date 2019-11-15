@@ -15,24 +15,12 @@
 package org.hyperledger.besu.cli.util;
 
 import org.hyperledger.besu.BesuInfo;
-import org.hyperledger.besu.services.PluginVersionsProvider;
-
-import java.util.stream.Stream;
 
 import picocli.CommandLine;
 
 public class VersionProvider implements CommandLine.IVersionProvider {
-  private final PluginVersionsProvider pluginVersionsProvider;
-
-  public VersionProvider(final PluginVersionsProvider pluginVersionsProvider) {
-    this.pluginVersionsProvider = pluginVersionsProvider;
-  }
-
   @Override
   public String[] getVersion() {
-    // the PluginVersionsProvider has registered plugins and their versions by this time.
-    return Stream.concat(
-            Stream.of(BesuInfo.version()), pluginVersionsProvider.getPluginVersions().stream())
-        .toArray(String[]::new);
+    return new String[] {BesuInfo.version()};
   }
 }

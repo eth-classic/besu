@@ -34,7 +34,6 @@ import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueSegmentIdentifier;
 import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBKeyValuePrivacyStorageFactory;
-import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBMetricsFactory;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBFactoryConfiguration;
 import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.testutil.TestClock;
@@ -106,8 +105,7 @@ public class PrivacyTest {
                         MAX_BACKGROUND_COMPACTIONS,
                         BACKGROUND_THREAD_COUNT,
                         CACHE_CAPACITY),
-                Arrays.asList(KeyValueSegmentIdentifier.values()),
-                RocksDBMetricsFactory.PRIVATE_ROCKS_DB_METRICS))
+                Arrays.asList(KeyValueSegmentIdentifier.values())))
         .withCommonConfiguration(new BesuConfigurationImpl(dataDir, dbDir))
         .withMetricsSystem(new NoOpMetricsSystem())
         .build();

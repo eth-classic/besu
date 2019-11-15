@@ -21,7 +21,6 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.util.Subscribers;
 import org.hyperledger.besu.util.uint.UInt256;
 
 import java.util.Arrays;
@@ -39,8 +38,7 @@ public class EthHashSolverTest {
   @Test
   public void emptyHashRateAndWorkDefinitionIsReportedPriorToSolverStarting() {
     final List<Long> noncesToTry = Arrays.asList(1L, 1L, 1L, 1L, 1L, 1L, 0L);
-    final EthHashSolver solver =
-        new EthHashSolver(noncesToTry, new EthHasher.Light(), false, Subscribers.none());
+    final EthHashSolver solver = new EthHashSolver(noncesToTry, new EthHasher.Light());
 
     assertThat(solver.hashesPerSecond()).isEqualTo(Optional.empty());
     assertThat(solver.getWorkDefinition()).isEqualTo(Optional.empty());
@@ -62,7 +60,7 @@ public class EthHashSolverTest {
         .when(hasher)
         .hash(any(), anyLong(), anyLong(), any());
 
-    final EthHashSolver solver = new EthHashSolver(noncesToTry, hasher, false, Subscribers.none());
+    final EthHashSolver solver = new EthHashSolver(noncesToTry, hasher);
 
     final Stopwatch operationTimer = Stopwatch.createStarted();
     final EthHashSolverInputs inputs = new EthHashSolverInputs(UInt256.ONE, new byte[0], 5);
@@ -120,9 +118,7 @@ public class EthHashSolverTest {
     final EthHashSolver solver =
         new EthHashSolver(
             Lists.newArrayList(expectedFirstOutput.getNonce(), 0L, expectedSecondOutput.getNonce()),
-            new EthHasher.Light(),
-            false,
-            Subscribers.none());
+            new EthHasher.Light());
 
     EthHashSolution soln =
         solver.solveFor(EthHashSolver.EthHashSolverJob.createFromInputs(firstInputs));

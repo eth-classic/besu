@@ -84,8 +84,6 @@ class EthServer {
               ethereumWireProtocolConfiguration.getMaxGetBlockHeaders());
       message.getPeer().send(response);
     } catch (final RLPException e) {
-      LOG.debug(
-          "Received malformed GET_BLOCK_HEADERS message, disconnecting: {}", message.getPeer(), e);
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
     } catch (final PeerNotConnected peerNotConnected) {
       // Peer disconnected before we could respond - nothing to do
@@ -102,8 +100,6 @@ class EthServer {
               ethereumWireProtocolConfiguration.getMaxGetBlockBodies());
       message.getPeer().send(response);
     } catch (final RLPException e) {
-      LOG.debug(
-          "Received malformed GET_BLOCK_BODIES message, disconnecting: {}", message.getPeer(), e);
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
     } catch (final PeerNotConnected peerNotConnected) {
       // Peer disconnected before we could respond - nothing to do
@@ -118,7 +114,6 @@ class EthServer {
               blockchain, message.getData(), ethereumWireProtocolConfiguration.getMaxGetReceipts());
       message.getPeer().send(response);
     } catch (final RLPException e) {
-      LOG.debug("Received malformed GET_RECEIPTS message, disconnecting: {}", message.getPeer(), e);
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
     } catch (final PeerNotConnected peerNotConnected) {
       // Peer disconnected before we could respond - nothing to do
@@ -135,8 +130,6 @@ class EthServer {
               ethereumWireProtocolConfiguration.getMaxGetNodeData());
       message.getPeer().send(response);
     } catch (final RLPException e) {
-      LOG.debug(
-          "Received malformed GET_NODE_DATA message, disconnecting: {}", message.getPeer(), e);
       message.getPeer().disconnect(DisconnectReason.BREACH_OF_PROTOCOL);
     } catch (final PeerNotConnected peerNotConnected) {
       // Peer disconnected before we could respond - nothing to do

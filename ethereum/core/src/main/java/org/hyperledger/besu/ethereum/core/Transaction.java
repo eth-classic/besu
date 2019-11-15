@@ -218,7 +218,6 @@ public class Transaction implements org.hyperledger.besu.plugin.data.Transaction
    *
    * @return the transaction payload
    */
-  @Override
   public BytesValue getPayload() {
     return payload;
   }
@@ -336,8 +335,7 @@ public class Transaction implements org.hyperledger.besu.plugin.data.Transaction
    *
    * @return the transaction hash
    */
-  @Override
-  public Hash getHash() {
+  public Hash hash() {
     if (hash == null) {
       final BytesValue rlp = RLP.encode(this::writeTo);
       hash = Hash.hash(rlp);

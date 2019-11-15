@@ -18,7 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.hyperledger.besu.ethereum.core.DefaultSyncStatus;
 import org.hyperledger.besu.ethereum.core.Synchronizer;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.plugin.data.SyncStatus;
@@ -143,6 +142,7 @@ public class ReadinessCheckTest {
   }
 
   private Optional<SyncStatus> createSyncStatus(final int currentBlock, final int highestBlock) {
-    return Optional.of(new DefaultSyncStatus(0, currentBlock, highestBlock));
+    return Optional.of(
+        new org.hyperledger.besu.ethereum.core.SyncStatus(0, currentBlock, highestBlock));
   }
 }

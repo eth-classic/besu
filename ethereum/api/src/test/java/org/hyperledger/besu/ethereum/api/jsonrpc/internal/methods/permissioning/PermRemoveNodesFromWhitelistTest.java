@@ -24,6 +24,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
@@ -59,9 +60,13 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Mock private NodeLocalConfigPermissioningController nodeLocalConfigPermissioningController;
 
+  private JsonRpcParameter params = new JsonRpcParameter();
+
   @Before
   public void setUp() {
-    method = new PermRemoveNodesFromWhitelist(Optional.of(nodeLocalConfigPermissioningController));
+    method =
+        new PermRemoveNodesFromWhitelist(
+            Optional.of(nodeLocalConfigPermissioningController), params);
   }
 
   @Test
@@ -131,7 +136,7 @@ public class PermRemoveNodesFromWhitelistTest {
 
   @Test
   public void shouldFailWhenP2pDisabled() {
-    method = new PermRemoveNodesFromWhitelist(Optional.empty());
+    method = new PermRemoveNodesFromWhitelist(Optional.empty(), params);
     final JsonRpcRequest request = buildRequest(Lists.newArrayList(enode1, enode2, enode3));
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(request.getId(), JsonRpcError.NODE_WHITELIST_NOT_ENABLED);

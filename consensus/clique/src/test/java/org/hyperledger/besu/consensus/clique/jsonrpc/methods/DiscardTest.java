@@ -21,6 +21,7 @@ import org.hyperledger.besu.consensus.common.VoteProposer;
 import org.hyperledger.besu.consensus.common.VoteType;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.exception.InvalidJsonRpcParameters;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponseType;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
@@ -37,7 +38,7 @@ public class DiscardTest {
   @Test
   public void discardEmpty() {
     final VoteProposer proposer = new VoteProposer();
-    final Discard discard = new Discard(proposer);
+    final Discard discard = new Discard(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
 
     final JsonRpcResponse response = discard.response(requestWithParams(a0));
@@ -51,7 +52,7 @@ public class DiscardTest {
   @Test
   public void discardAuth() {
     final VoteProposer proposer = new VoteProposer();
-    final Discard discard = new Discard(proposer);
+    final Discard discard = new Discard(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
 
     proposer.auth(a0);
@@ -67,7 +68,7 @@ public class DiscardTest {
   @Test
   public void discardDrop() {
     final VoteProposer proposer = new VoteProposer();
-    final Discard discard = new Discard(proposer);
+    final Discard discard = new Discard(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
 
     proposer.drop(a0);
@@ -83,7 +84,7 @@ public class DiscardTest {
   @Test
   public void discardIsolation() {
     final VoteProposer proposer = new VoteProposer();
-    final Discard discard = new Discard(proposer);
+    final Discard discard = new Discard(proposer, new JsonRpcParameter());
     final Address a0 = Address.fromHexString("0");
     final Address a1 = Address.fromHexString("1");
 
@@ -102,7 +103,7 @@ public class DiscardTest {
   @Test
   public void discardWithoutAddress() {
     final VoteProposer proposer = new VoteProposer();
-    final Discard discard = new Discard(proposer);
+    final Discard discard = new Discard(proposer, new JsonRpcParameter());
 
     assertThatThrownBy(() -> discard.response(requestWithParams()))
         .hasMessage("Missing required json rpc parameter at index 0")

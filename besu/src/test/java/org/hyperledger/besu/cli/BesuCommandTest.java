@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.cli.config.NetworkName.CLASSIC;
 import static org.hyperledger.besu.cli.config.NetworkName.DEV;
 import static org.hyperledger.besu.cli.config.NetworkName.GOERLI;
-import static org.hyperledger.besu.cli.config.NetworkName.KOTTI;
 import static org.hyperledger.besu.cli.config.NetworkName.MAINNET;
 import static org.hyperledger.besu.cli.config.NetworkName.RINKEBY;
 import static org.hyperledger.besu.cli.config.NetworkName.ROPSTEN;
@@ -56,7 +55,7 @@ import org.hyperledger.besu.ethereum.p2p.peers.EnodeURL;
 import org.hyperledger.besu.ethereum.permissioning.LocalPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.PermissioningConfiguration;
 import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
-import org.hyperledger.besu.ethereum.worldstate.PrunerConfiguration;
+import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
 import org.hyperledger.besu.metrics.StandardMetricCategory;
 import org.hyperledger.besu.metrics.prometheus.MetricsConfiguration;
 import org.hyperledger.besu.nat.NatMethod;
@@ -995,16 +994,6 @@ public class BesuCommandTest extends CommandTestAbstract {
     parseCommand("--genesis", path.toString());
     assertThat(commandErrorOutput.toString()).startsWith("Unknown options: --genesis, .");
     assertThat(commandOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void identityValueTrueMustBeUsed() {
-    parseCommand("--identity", "test");
-
-    verify(mockRunnerBuilder.identityString(eq(Optional.of("test")))).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -2285,25 +2274,6 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void stratumMiningIsEnabledWhenSpecified() throws Exception {
-    final String coinbaseStr = String.format("%040x", 1);
-    parseCommand("--miner-enabled", "--miner-coinbase=" + coinbaseStr, "--miner-stratum-enabled");
-
-    final ArgumentCaptor<MiningParameters> miningArg =
-        ArgumentCaptor.forClass(MiningParameters.class);
-
-    verify(mockControllerBuilder).miningParameters(miningArg.capture());
-    verify(mockControllerBuilder).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-    assertThat(miningArg.getValue().isMiningEnabled()).isTrue();
-    assertThat(miningArg.getValue().getCoinbase())
-        .isEqualTo(Optional.of(Address.fromHexString(coinbaseStr)));
-    assertThat(miningArg.getValue().isStratumMiningEnabled()).isTrue();
-  }
-
-  @Test
   public void miningOptionsRequiresServiceToBeEnabled() {
 
     final Address requestedCoinbase = Address.fromHexString("0000011111222223333344444");
@@ -2313,20 +2283,13 @@ public class BesuCommandTest extends CommandTestAbstract {
         "--min-gas-price",
         "42",
         "--miner-extra-data",
-        "0x1122334455667788990011223344556677889900112233445566778899001122",
-        "--miner-stratum-enabled");
+        "0x1122334455667788990011223344556677889900112233445566778899001122");
 
     verifyOptionsConstraintLoggerCall(
-        "--miner-enabled",
-        "--miner-coinbase",
-        "--min-gas-price",
-        "--miner-extra-data",
-        "--miner-stratum-enabled");
+        "--miner-enabled", "--miner-coinbase", "--min-gas-price", "--miner-extra-data");
 
     assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString())
-        .startsWith(
-            "Unable to mine with Stratum if mining is disabled. Either disable Stratum mining (remove --miner-stratum-enabled)or specify mining is enabled (--miner-enabled)");
+    assertThat(commandErrorOutput.toString()).isEmpty();
   }
 
   @Test
@@ -2355,47 +2318,10 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void pruningIsEnabledIfSyncModeIsFast() {
-    parseCommand("--sync-mode", "FAST");
-<<<<<<< HEAD
-
-    verify(mockControllerBuilder).isPruningEnabled(true);
-    verify(mockControllerBuilder).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void pruningIsDisabledIfSyncModeIsFull() {
-    parseCommand("--sync-mode", "FULL");
-
-    verify(mockControllerBuilder).isPruningEnabled(false);
-    verify(mockControllerBuilder).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void pruningEnabledExplicitly() {
+  public void pruningIsEnabledWhenSpecified() throws Exception {
     parseCommand("--pruning-enabled");
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
     verify(mockControllerBuilder).isPruningEnabled(true);
-    verify(mockControllerBuilder).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-<<<<<<< HEAD
-  public void pruningDisabledExplicitly() {
-    parseCommand("--pruning-enabled=false");
-
-    verify(mockControllerBuilder).isPruningEnabled(false);
     verify(mockControllerBuilder).build();
 
     assertThat(commandOutput.toString()).isEmpty();
@@ -2404,35 +2330,11 @@ public class BesuCommandTest extends CommandTestAbstract {
 
   @Test
   public void pruningOptionsRequiresServiceToBeEnabled() {
-=======
-  public void pruningIsDisabledIfSyncModeIsFull() {
-    parseCommand("--sync-mode", "FULL");
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
-    verify(mockControllerBuilder).isPruningEnabled(false);
-    verify(mockControllerBuilder).build();
+    parseCommand("--pruning-blocks-retained", "4", "--pruning-block-confirmations", "1");
 
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void pruningEnabledExplicitly() {
-    parseCommand("--pruning-enabled", "--sync-mode=FULL");
-
-    verify(mockControllerBuilder).isPruningEnabled(true);
-    verify(mockControllerBuilder).build();
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void pruningDisabledExplicitly() {
-    parseCommand("--pruning-enabled=false", "--sync-mode=FAST");
-
-    verify(mockControllerBuilder).isPruningEnabled(false);
-    verify(mockControllerBuilder).build();
+    verifyOptionsConstraintLoggerCall(
+        "--pruning-enabled", "--pruning-blocks-retained", "--pruning-block-confirmations");
 
     assertThat(commandOutput.toString()).isEmpty();
     assertThat(commandErrorOutput.toString()).isEmpty();
@@ -2441,10 +2343,10 @@ public class BesuCommandTest extends CommandTestAbstract {
   @Test
   public void pruningParametersAreCaptured() throws Exception {
     parseCommand(
-        "--pruning-enabled", "--Xpruning-blocks-retained=15", "--Xpruning-block-confirmations=4");
+        "--pruning-enabled", "--pruning-blocks-retained=15", "--pruning-block-confirmations=4");
 
-    final ArgumentCaptor<PrunerConfiguration> pruningArg =
-        ArgumentCaptor.forClass(PrunerConfiguration.class);
+    final ArgumentCaptor<PruningConfiguration> pruningArg =
+        ArgumentCaptor.forClass(PruningConfiguration.class);
 
     verify(mockControllerBuilder).pruningConfiguration(pruningArg.capture());
     verify(mockControllerBuilder).build();
@@ -2536,22 +2438,6 @@ public class BesuCommandTest extends CommandTestAbstract {
   }
 
   @Test
-  public void kottiValuesAreUsed() throws Exception {
-    parseCommand("--network", "kotti");
-
-    final ArgumentCaptor<EthNetworkConfig> networkArg =
-        ArgumentCaptor.forClass(EthNetworkConfig.class);
-
-    verify(mockControllerBuilderFactory).fromEthNetworkConfig(networkArg.capture(), any());
-    verify(mockControllerBuilder).build();
-
-    assertThat(networkArg.getValue()).isEqualTo(EthNetworkConfig.getNetworkConfig(KOTTI));
-
-    assertThat(commandOutput.toString()).isEmpty();
-    assertThat(commandErrorOutput.toString()).isEmpty();
-  }
-
-  @Test
   public void rinkebyValuesCanBeOverridden() throws Exception {
     networkValuesCanBeOverridden("rinkeby");
   }
@@ -2574,11 +2460,6 @@ public class BesuCommandTest extends CommandTestAbstract {
   @Test
   public void classicValuesCanBeOverridden() throws Exception {
     networkValuesCanBeOverridden("classic");
-  }
-
-  @Test
-  public void kottiValuesCanBeOverridden() throws Exception {
-    networkValuesCanBeOverridden("kotti");
   }
 
   private void networkValuesCanBeOverridden(final String network) throws Exception {
@@ -2766,22 +2647,6 @@ public class BesuCommandTest extends CommandTestAbstract {
     parseCommand("--privacy-public-key-file", path.toString());
     assertThat(commandErrorOutput.toString())
         .startsWith("Unknown options: --privacy-public-key-file, .");
-    assertThat(commandOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void privacyWithFastSyncMustError() {
-    parseCommand("--sync-mode=FAST", "--privacy-enabled");
-
-    assertThat(commandErrorOutput.toString()).contains("Fast sync cannot be enabled with privacy.");
-    assertThat(commandOutput.toString()).isEmpty();
-  }
-
-  @Test
-  public void privacyWithPruningMustError() {
-    parseCommand("--pruning-enabled", "--privacy-enabled");
-
-    assertThat(commandErrorOutput.toString()).contains("Pruning cannot be enabled with privacy.");
     assertThat(commandOutput.toString()).isEmpty();
   }
 

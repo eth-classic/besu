@@ -20,7 +20,7 @@ import org.hyperledger.besu.config.JsonGenesisConfigOptions;
 import org.hyperledger.besu.config.JsonUtil;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.processor.BlockReplay;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.blockcreation.IncrementingNonceGenerator;
 import org.hyperledger.besu.ethereum.chain.DefaultBlockchain;
 import org.hyperledger.besu.ethereum.chain.GenesisState;
@@ -54,7 +54,6 @@ import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
 import org.hyperledger.besu.services.kvstore.InMemoryKeyValueStorage;
-import org.hyperledger.besu.util.Subscribers;
 
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -149,8 +148,8 @@ public class RetestethContext {
     final Iterable<Long> nonceGenerator = new IncrementingNonceGenerator(0);
     ethHashSolver =
         ("NoProof".equals(sealengine) || "NoReward".equals(sealEngine))
-            ? new EthHashSolver(nonceGenerator, NO_WORK_HASHER, false, Subscribers.none())
-            : new EthHashSolver(nonceGenerator, new EthHasher.Light(), false, Subscribers.none());
+            ? new EthHashSolver(nonceGenerator, NO_WORK_HASHER)
+            : new EthHashSolver(nonceGenerator, new EthHasher.Light());
 
     blockReplay =
         new BlockReplay(

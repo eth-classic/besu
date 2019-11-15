@@ -14,12 +14,12 @@
  */
 package org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters;
 
-import static java.util.Collections.emptyList;
-
+import org.hyperledger.besu.ethereum.api.TopicsParameter;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.Hash;
-import org.hyperledger.besu.ethereum.core.LogTopic;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,7 +33,7 @@ public class FilterParameter {
   private final BlockParameter fromBlock;
   private final BlockParameter toBlock;
   private final List<Address> addresses;
-  private final List<List<LogTopic>> topics;
+  private final TopicsParameter topics;
   private final Hash blockhash;
 
   @JsonCreator
@@ -41,16 +41,24 @@ public class FilterParameter {
       @JsonProperty("fromBlock") final String fromBlock,
       @JsonProperty("toBlock") final String toBlock,
       @JsonFormat(with = JsonFormat.Feature.ACCEPT_SINGLE_VALUE_AS_ARRAY) @JsonProperty("address")
-          final List<Address> address,
+          final List<String> address,
       @JsonDeserialize(using = TopicsDeserializer.class) @JsonProperty("topics")
-          final List<List<LogTopic>> topics,
+          final TopicsParameter topics,
       @JsonProperty("blockhash") final String blockhash) {
     this.fromBlock =
         fromBlock != null ? new BlockParameter(fromBlock) : new BlockParameter("latest");
     this.toBlock = toBlock != null ? new BlockParameter(toBlock) : new BlockParameter("latest");
-    this.addresses = address != null ? address : emptyList();
-    this.topics = topics != null ? topics : emptyList();
+    this.addresses = address != null ? renderAddress(address) : Collections.emptyList();
+    this.topics = topics != null ? topics : new TopicsParameter(Collections.emptyList());
     this.blockhash = blockhash != null ? Hash.fromHexString(blockhash) : null;
+  }
+
+  private List<Address> renderAddress(final List<String> inputAddresses) {
+    final List<Address> addresses = new ArrayList<>();
+    for (final String value : inputAddresses) {
+      addresses.add(Address.fromHexString(value));
+    }
+    return addresses;
   }
 
   public BlockParameter getFromBlock() {
@@ -65,7 +73,7 @@ public class FilterParameter {
     return addresses;
   }
 
-  public List<List<LogTopic>> getTopics() {
+  public TopicsParameter getTopics() {
     return topics;
   }
 

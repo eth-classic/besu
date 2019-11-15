@@ -15,6 +15,7 @@
 package org.hyperledger.besu.ethereum.api.jsonrpc.websocket.methods;
 
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.SubscriptionManager;
 import org.hyperledger.besu.ethereum.api.jsonrpc.websocket.subscription.request.SubscriptionRequestMapper;
 
@@ -25,6 +26,7 @@ public class WebSocketMethodsFactory {
 
   private final SubscriptionManager subscriptionManager;
   private final Map<String, JsonRpcMethod> jsonRpcMethods;
+  private final JsonRpcParameter parameter = new JsonRpcParameter();
 
   public WebSocketMethodsFactory(
       final SubscriptionManager subscriptionManager,
@@ -38,8 +40,8 @@ public class WebSocketMethodsFactory {
     websocketMethods.putAll(jsonRpcMethods);
     addMethods(
         websocketMethods,
-        new EthSubscribe(subscriptionManager, new SubscriptionRequestMapper()),
-        new EthUnsubscribe(subscriptionManager, new SubscriptionRequestMapper()));
+        new EthSubscribe(subscriptionManager, new SubscriptionRequestMapper(parameter)),
+        new EthUnsubscribe(subscriptionManager, new SubscriptionRequestMapper(parameter)));
     return websocketMethods;
   }
 

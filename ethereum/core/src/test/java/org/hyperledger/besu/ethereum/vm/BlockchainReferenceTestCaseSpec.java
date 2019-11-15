@@ -43,7 +43,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties({"_info", "postState", "postStateHash"})
+@JsonIgnoreProperties({"_info", "postState"})
 public class BlockchainReferenceTestCaseSpec {
 
   private final String network;

@@ -30,9 +30,8 @@ public class RocksDBKeyValuePrivacyStorageFactory extends RocksDBKeyValueStorage
 
   public RocksDBKeyValuePrivacyStorageFactory(
       final Supplier<RocksDBFactoryConfiguration> configuration,
-      final List<SegmentIdentifier> segments,
-      final RocksDBMetricsFactory rocksDBMetricsFactory) {
-    super(configuration, segments, rocksDBMetricsFactory);
+      final List<SegmentIdentifier> segments) {
+    super(configuration, segments);
   }
 
   @Override

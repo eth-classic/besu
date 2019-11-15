@@ -45,7 +45,6 @@ import org.hyperledger.besu.cli.error.BesuExceptionHandler;
 import org.hyperledger.besu.cli.options.EthProtocolOptions;
 import org.hyperledger.besu.cli.options.MetricsCLIOptions;
 import org.hyperledger.besu.cli.options.NetworkingOptions;
-import org.hyperledger.besu.cli.options.PrunerOptions;
 import org.hyperledger.besu.cli.options.SynchronizerOptions;
 import org.hyperledger.besu.cli.options.TransactionPoolOptions;
 import org.hyperledger.besu.cli.subcommands.PasswordSubCommand;
@@ -57,11 +56,12 @@ import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.JsonBlockImp
 import org.hyperledger.besu.cli.subcommands.blocks.BlocksSubCommand.RlpBlockExporterFactory;
 import org.hyperledger.besu.cli.subcommands.operator.OperatorSubCommand;
 import org.hyperledger.besu.cli.subcommands.rlp.RLPSubCommand;
-import org.hyperledger.besu.cli.util.BesuCommandCustomFactory;
 import org.hyperledger.besu.cli.util.CommandLineUtils;
 import org.hyperledger.besu.cli.util.ConfigOptionSearchAndRunHandler;
 import org.hyperledger.besu.cli.util.VersionProvider;
 import org.hyperledger.besu.config.GenesisConfigFile;
+import org.hyperledger.besu.consensus.common.PoAContext;
+import org.hyperledger.besu.consensus.common.PoAMetricServiceImpl;
 import org.hyperledger.besu.controller.BesuController;
 import org.hyperledger.besu.controller.BesuControllerBuilder;
 import org.hyperledger.besu.controller.KeyPairUtil;
@@ -87,6 +87,7 @@ import org.hyperledger.besu.ethereum.permissioning.PermissioningConfigurationBui
 import org.hyperledger.besu.ethereum.permissioning.SmartContractPermissioningConfiguration;
 import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProvider;
 import org.hyperledger.besu.ethereum.storage.keyvalue.KeyValueStorageProviderBuilder;
+import org.hyperledger.besu.ethereum.worldstate.PruningConfiguration;
 import org.hyperledger.besu.metrics.BesuMetricCategory;
 import org.hyperledger.besu.metrics.MetricCategoryRegistryImpl;
 import org.hyperledger.besu.metrics.ObservableMetricsSystem;
@@ -103,6 +104,7 @@ import org.hyperledger.besu.plugin.services.StorageService;
 import org.hyperledger.besu.plugin.services.exception.StorageException;
 import org.hyperledger.besu.plugin.services.metrics.MetricCategory;
 import org.hyperledger.besu.plugin.services.metrics.MetricCategoryRegistry;
+import org.hyperledger.besu.plugin.services.metrics.PoAMetricsService;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.RocksDBPlugin;
 import org.hyperledger.besu.services.BesuConfigurationImpl;
 import org.hyperledger.besu.services.BesuEventsImpl;
@@ -185,7 +187,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
   final EthProtocolOptions ethProtocolOptions = EthProtocolOptions.create();
   final MetricsCLIOptions metricsCLIOptions = MetricsCLIOptions.create();
   final TransactionPoolOptions transactionPoolOptions = TransactionPoolOptions.create();
-  final PrunerOptions prunerOptions = PrunerOptions.create();
   private final RunnerBuilder runnerBuilder;
   private final BesuController.Builder controllerBuilderFactory;
   private final BesuPluginContextImpl besuPluginContext;
@@ -207,13 +208,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
 
   // CLI options defined by user at runtime.
   // Options parsing is done with CLI library Picocli https://picocli.info/
-
-  @Option(
-      names = "--identity",
-      paramLabel = "<String>",
-      description = "Identification for this node in the Client ID",
-      arity = "1")
-  private final Optional<String> identityString = Optional.empty();
 
   // Completely disables P2P within Besu.
   @Option(
@@ -554,36 +548,13 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
       names = {"--logging", "-l"},
       paramLabel = "<LOG VERBOSITY LEVEL>",
       description =
-          "Logging verbosity levels: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL (default: ${DEFAULT-VALUE})")
-  private final Level logLevel = LogManager.getRootLogger().getLevel();
+          "Logging verbosity levels: OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE, ALL (default: INFO)")
+  private final Level logLevel = null;
 
   @Option(
       names = {"--miner-enabled"},
       description = "Set if node will perform mining (default: ${DEFAULT-VALUE})")
   private final Boolean isMiningEnabled = false;
-
-  @Option(
-      names = {"--miner-stratum-enabled"},
-      description = "Set if node will perform Stratum mining (default: ${DEFAULT-VALUE})")
-  private final Boolean iStratumMiningEnabled = false;
-
-  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
-  @Option(
-      names = {"--miner-stratum-host"},
-      description = "Host for Stratum network mining service (default: ${DEFAULT-VALUE})")
-  private String stratumNetworkInterface = "0.0.0.0";
-
-  @Option(
-      names = {"--miner-stratum-port"},
-      description = "Stratum port binding (default: ${DEFAULT-VALUE})")
-  private final Integer stratumPort = 8008;
-
-  @SuppressWarnings("FieldMayBeFinal") // Because PicoCLI requires Strings to not be final.
-  @Option(
-      hidden = true,
-      names = {"--Xminer-stratum-extranonce"},
-      description = "Extranonce for Stratum network miners (default: ${DEFAULT-VALUE})")
-  private String stratumExtranonce = "080c";
 
   @Option(
       names = {"--miner-coinbase"},
@@ -611,10 +582,10 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
 
   @Option(
       names = {"--pruning-enabled"},
+      hidden = true,
       description =
-<<<<<<< HEAD
-          "Enable pruning of world state of blocks older than the retention period (default: true if fast sync is enabled, false otherwise)")
-  private Boolean pruningOverride;
+          "Enable pruning of world state of blocks older than the retention period (default: ${DEFAULT-VALUE})")
+  private final Boolean isPruningEnabled = false;
 
   @Option(
       names = {"--pruning-blocks-retained"},
@@ -631,10 +602,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
           "Minimum number of confirmations on a block before marking begins (default: ${DEFAULT-VALUE})",
       arity = "1")
   private final Long pruningBlockConfirmations = DEFAULT_PRUNING_BLOCK_CONFIRMATIONS;
-=======
-          "Enable disk-space saving optimization that removes old state that is unlikely to be required (default: true if fast sync is enabled, false otherwise)")
-  private Boolean pruningOverride;
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
 
   @Option(
       names = {"--permissions-nodes-config-file-enabled"},
@@ -806,9 +773,7 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
       final BesuExceptionHandler exceptionHandler,
       final InputStream in,
       final String... args) {
-    commandLine =
-        new CommandLine(this, new BesuCommandCustomFactory(besuPluginContext))
-            .setCaseInsensitiveEnumValuesAllowed(true);
+    commandLine = new CommandLine(this).setCaseInsensitiveEnumValuesAllowed(true);
     handleStandaloneCommand()
         .addSubCommands(resultHandler, in)
         .registerConverters()
@@ -821,7 +786,7 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
   public void run() {
     try {
       prepareLogging();
-      logger.info("Starting Besu version: {}", BesuInfo.nodeName(identityString));
+      logger.info("Starting Besu version: {}", BesuInfo.version());
       validateOptions().configure().controller().startPlugins().startSynchronization();
     } catch (final Exception e) {
       throw new ParameterException(this.commandLine, e.getMessage(), e);
@@ -881,7 +846,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
     commandLine.registerConverter(Wei.class, (arg) -> Wei.of(Long.parseUnsignedLong(arg)));
     commandLine.registerConverter(PositiveNumber.class, PositiveNumber::fromString);
     commandLine.registerConverter(Hash.class, Hash::fromHexString);
-    commandLine.registerConverter(Optional.class, Optional::of);
 
     metricCategoryConverter.addCategories(BesuMetricCategory.class);
     metricCategoryConverter.addCategories(StandardMetricCategory.class);
@@ -899,7 +863,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
             .put("P2P Network", networkingOptions)
             .put("Synchronizer", synchronizerOptions)
             .put("TransactionPool", transactionPoolOptions)
-            .put("Pruner", prunerOptions)
             .build();
 
     UnstableOptionsSubCommand.createUnstableOptions(commandLine, unstableOptions);
@@ -958,14 +921,26 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
     besuPluginContext.addService(
         BesuEvents.class,
         new BesuEventsImpl(
-            besuController.getProtocolContext().getBlockchain(),
             besuController.getProtocolManager().getBlockBroadcaster(),
             besuController.getTransactionPool(),
             besuController.getSyncState()));
-    besuPluginContext.addService(MetricsSystem.class, getMetricsSystem());
-    besuController.getAdditionalPluginServices().appendPluginServices(besuPluginContext);
+    addPluginMetrics(besuController);
     besuPluginContext.startPlugins();
     return this;
+  }
+
+  private void addPluginMetrics(final BesuController<?> besuController) {
+    besuPluginContext.addService(MetricsSystem.class, getMetricsSystem());
+
+    final Object consensusState = besuController.getProtocolContext().getConsensusState();
+
+    if (consensusState != null && PoAContext.class.isAssignableFrom(consensusState.getClass())) {
+      final PoAMetricServiceImpl service =
+          new PoAMetricServiceImpl(
+              ((PoAContext) consensusState).getBlockInterface(),
+              besuController.getProtocolContext().getBlockchain());
+      besuPluginContext.addService(PoAMetricsService.class, service);
+    }
   }
 
   private void prepareLogging() {
@@ -985,19 +960,13 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
     return this;
   }
 
-  @SuppressWarnings("ConstantConditions")
   private void validateMiningParams() {
+    // noinspection ConstantConditions
     if (isMiningEnabled && coinbase == null) {
       throw new ParameterException(
           this.commandLine,
           "Unable to mine without a valid coinbase. Either disable mining (remove --miner-enabled)"
               + "or specify the beneficiary of mining (via --miner-coinbase <Address>)");
-    }
-    if (!isMiningEnabled && iStratumMiningEnabled) {
-      throw new ParameterException(
-          this.commandLine,
-          "Unable to mine with Stratum if mining is disabled. Either disable Stratum mining (remove --miner-stratum-enabled)"
-              + "or specify mining is enabled (--miner-enabled)");
     }
   }
 
@@ -1035,11 +1004,7 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
         commandLine,
         "--miner-enabled",
         !isMiningEnabled,
-        asList(
-            "--miner-coinbase",
-            "--min-gas-price",
-            "--miner-extra-data",
-            "--miner-stratum-enabled"));
+        asList("--miner-coinbase", "--min-gas-price", "--miner-extra-data"));
 
     CommandLineUtils.checkOptionDependencies(
         logger,
@@ -1047,16 +1012,13 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
         "--sync-mode",
         !SyncMode.FAST.equals(syncMode),
         singletonList("--fast-sync-min-peers"));
-<<<<<<< HEAD
 
     CommandLineUtils.checkOptionDependencies(
         logger,
         commandLine,
         "--pruning-enabled",
-        !isPruningEnabled(),
+        !isPruningEnabled,
         asList("--pruning-block-confirmations", "--pruning-blocks-retained"));
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
   }
 
   private BesuCommand configure() throws Exception {
@@ -1123,15 +1085,7 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
           .ethProtocolConfiguration(ethProtocolOptions.toDomainObject())
           .dataDirectory(dataDir())
           .miningParameters(
-              new MiningParameters(
-                  coinbase,
-                  minTransactionGasPrice,
-                  extraData,
-                  isMiningEnabled,
-                  iStratumMiningEnabled,
-                  stratumNetworkInterface,
-                  stratumPort,
-                  stratumExtranonce))
+              new MiningParameters(coinbase, minTransactionGasPrice, extraData, isMiningEnabled))
           .transactionPoolConfiguration(buildTransactionPoolConfiguration())
           .nodePrivateKeyFile(nodePrivateKeyFile())
           .metricsSystem(metricsSystem.get())
@@ -1139,12 +1093,8 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
           .clock(Clock.systemUTC())
           .isRevertReasonEnabled(isRevertReasonEnabled)
           .storageProvider(keyStorageProvider(keyValueStorageName))
-          .isPruningEnabled(isPruningEnabled())
-<<<<<<< HEAD
+          .isPruningEnabled(isPruningEnabled)
           .pruningConfiguration(buildPruningConfiguration())
-=======
-          .pruningConfiguration(prunerOptions.toDomainObject())
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
           .genesisConfigOverrides(genesisConfigOverrides)
           .targetGasLimit(targetGasLimit == null ? Optional.empty() : Optional.of(targetGasLimit))
           .requiredBlocks(requiredBlocks);
@@ -1381,14 +1331,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
 
     final PrivacyParameters.Builder privacyParametersBuilder = new PrivacyParameters.Builder();
     if (isPrivacyEnabled) {
-      final String errorSuffix = "cannot be enabled with privacy.";
-      if (syncMode == SyncMode.FAST) {
-        throw new ParameterException(commandLine, String.format("%s %s", "Fast sync", errorSuffix));
-      }
-      if (isPruningEnabled()) {
-        throw new ParameterException(commandLine, String.format("%s %s", "Pruning", errorSuffix));
-      }
-
       privacyParametersBuilder.setEnabled(true);
       privacyParametersBuilder.setEnclaveUrl(privacyUrl);
       if (privacyPublicKeyFile() != null) {
@@ -1434,12 +1376,8 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
         .build();
   }
 
-  private boolean isPruningEnabled() {
-    return Optional.ofNullable(pruningOverride).orElse(syncMode == SyncMode.FAST);
-  }
-
-  private boolean isPruningEnabled() {
-    return Optional.ofNullable(pruningOverride).orElse(syncMode == SyncMode.FAST);
+  private PruningConfiguration buildPruningConfiguration() {
+    return new PruningConfiguration(pruningBlockConfirmations, pruningBlocksRetained);
   }
 
   // Blockchain synchronisation from peers.
@@ -1488,7 +1426,6 @@ public class BesuCommand implements DefaultCommandValues, Runnable {
             .metricsSystem(metricsSystem)
             .metricsConfiguration(metricsConfiguration)
             .staticNodes(staticNodes)
-            .identityString(identityString)
             .build();
 
     addShutdownHook(runner);

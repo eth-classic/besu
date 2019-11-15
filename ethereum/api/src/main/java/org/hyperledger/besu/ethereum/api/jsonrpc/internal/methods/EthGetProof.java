@@ -17,16 +17,13 @@ package org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequest;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.BlockParameter;
-<<<<<<< HEAD
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.JsonRpcParameter;
-=======
->>>>>>> 9b9c373c88e4b662e81e83a516597e69d2e45b27
+import org.hyperledger.besu.ethereum.api.jsonrpc.internal.queries.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.proof.GetProofResult;
-import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.core.Address;
 import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.proof.WorldStateProof;
@@ -41,24 +38,24 @@ public class EthGetProof extends AbstractBlockParameterMethod {
 
   private final BlockchainQueries blockchain;
 
-  public EthGetProof(final BlockchainQueries blockchain) {
-    super(blockchain);
+  public EthGetProof(final BlockchainQueries blockchain, final JsonRpcParameter parameters) {
+    super(blockchain, parameters);
     this.blockchain = blockchain;
   }
 
   private Address getAddress(final JsonRpcRequest request) {
-    return request.getRequiredParameter(0, Address.class);
+    return getParameters().required(request.getParams(), 0, Address.class);
   }
 
   private List<UInt256> getStorageKeys(final JsonRpcRequest request) {
-    return Arrays.stream(request.getRequiredParameter(1, String[].class))
+    return Arrays.stream(getParameters().required(request.getParams(), 1, String[].class))
         .map(UInt256::fromHexString)
         .collect(Collectors.toList());
   }
 
   @Override
   protected BlockParameter blockParameter(final JsonRpcRequest request) {
-    return request.getRequiredParameter(2, BlockParameter.class);
+    return getParameters().required(request.getParams(), 2, BlockParameter.class);
   }
 
   @Override

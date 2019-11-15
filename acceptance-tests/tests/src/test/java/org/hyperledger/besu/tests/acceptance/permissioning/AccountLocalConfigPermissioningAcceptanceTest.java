@@ -14,6 +14,8 @@
  */
 package org.hyperledger.besu.tests.acceptance.permissioning;
 
+import static org.web3j.utils.Convert.Unit.ETHER;
+
 import org.hyperledger.besu.tests.acceptance.dsl.AcceptanceTestBase;
 import org.hyperledger.besu.tests.acceptance.dsl.account.Account;
 import org.hyperledger.besu.tests.acceptance.dsl.node.Node;
@@ -50,7 +52,7 @@ public class AccountLocalConfigPermissioningAcceptanceTest extends AcceptanceTes
     Account beneficiary = accounts.createAccount("beneficiary");
 
     node.execute(accountTransactions.createTransfer(senderA, beneficiary, 1));
-    node.verify(beneficiary.balanceEquals(1));
+    node.verify(beneficiary.balanceEquals("1", ETHER));
 
     verifyTransferForbidden(senderB, beneficiary);
   }
@@ -58,7 +60,7 @@ public class AccountLocalConfigPermissioningAcceptanceTest extends AcceptanceTes
   @Test
   public void manipulatingAccountsWhitelistViaJsonRpc() {
     Account beneficiary = accounts.createAccount("beneficiary");
-    node.verify(beneficiary.balanceEquals(0));
+    node.verify(beneficiary.balanceEquals("0", ETHER));
 
     verifyTransferForbidden(senderB, beneficiary);
 
@@ -66,7 +68,7 @@ public class AccountLocalConfigPermissioningAcceptanceTest extends AcceptanceTes
     node.verify(perm.expectAccountsWhitelist(senderA.getAddress(), senderB.getAddress()));
 
     node.execute(accountTransactions.createTransfer(senderB, beneficiary, 1));
-    node.verify(beneficiary.balanceEquals(1));
+    node.verify(beneficiary.balanceEquals("1", ETHER));
 
     node.execute(permissioningTransactions.removeAccountsFromWhitelist(senderB.getAddress()));
     node.verify(perm.expectAccountsWhitelist(senderA.getAddress()));
